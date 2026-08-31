@@ -42,8 +42,46 @@
 		return content;
 	}
 
-	function addJourney(map, journey, bounds, index) {
-		var coordinates = journey.stops.map(function (stop) {
+	function coordinateKey(stop) {
+		return Number(stop.longitude).toFixed(4) + ',' + Number(stop.latitude).toFixed(4);
+	}
+
+	function buildDisplayCoordinates(journeys) {
+		var occurrences = {};
+		var positions = {};
+
+		journeys.forEach(function (journey) {
+			journey.stops.forEach(function (stop) {
+				var key = coordinateKey(stop);
+				occurrences[key] = (occurrences[key] || 0) + 1;
+			});
+		});
+
+		journeys.forEach(function (journey) {
+			positions[journey.id] = journey.stops.map(function (stop) {
+				var key = coordinateKey(stop);
+				var total = occurrences[key];
+				var occurrence = positions[key] || 0;
+				positions[key] = occurrence + 1;
+
+				if (total < 2) {
+					return [stop.longitude, stop.latitude];
+				}
+
+				var angle = (Math.PI * 2 * occurrence / total) - (Math.PI / 2);
+				var radius = 0.22;
+				return [
+					Number(stop.longitude) + (Math.cos(angle) * radius),
+					Number(stop.latitude) + (Math.sin(angle) * radius)
+				];
+			});
+		});
+
+		return positions;
+	}
+
+	function addJourney(map, journey, bounds, index, totalJourneys, displayCoordinates) {
+		var coordinates = displayCoordinates[journey.id] || journey.stops.map(function (stop) {
 			return [stop.longitude, stop.latitude];
 		});
 
@@ -69,8 +107,9 @@
 				layout: { 'line-cap': 'round', 'line-join': 'round' },
 				paint: {
 					'line-color': journey.color,
-					'line-width': 4,
-					'line-opacity': 0.82
+					'line-width': 3,
+					'line-opacity': 0.88,
+					'line-offset': (index - ((totalJourneys - 1) / 2)) * 2
 				}
 			});
 		}
@@ -81,12 +120,12 @@
 			marker.className = 'heritaste-map-marker';
 			marker.style.setProperty('--heritaste-marker-color', journey.color);
 			marker.setAttribute('aria-label', journey.participant.name + ': ' + stop.title);
-			marker.textContent = String(stopIndex + 1);
+			marker.setAttribute('title', stop.title);
 
 			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: '320px' })
 				.setDOMContent(createPopupContent(journey, stop));
-			var mapMarker = new mapboxgl.Marker({ element: marker, anchor: 'center' })
-				.setLngLat([stop.longitude, stop.latitude])
+			var mapMarker = new mapboxgl.Marker({ element: marker, anchor: 'bottom' })
+				.setLngLat(coordinates[stopIndex])
 				.setPopup(popup)
 				.addTo(map);
 
@@ -131,8 +170,9 @@
 
 		map.on('load', function () {
 			var bounds = new mapboxgl.LngLatBounds();
+			var displayCoordinates = buildDisplayCoordinates(payload.journeys);
 			payload.journeys.forEach(function (journey, index) {
-				addJourney(map, journey, bounds, index);
+				addJourney(map, journey, bounds, index, payload.journeys.length, displayCoordinates);
 			});
 
 			if (!bounds.isEmpty()) {

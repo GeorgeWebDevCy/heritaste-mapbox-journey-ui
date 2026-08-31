@@ -104,6 +104,17 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 		<section class="heritaste-journey-map<?php echo $is_fullscreen ? ' heritaste-journey-map--fullscreen' : ''; ?>" aria-labelledby="<?php echo esc_attr( $instance_id ); ?>-title">
 			<h2 class="screen-reader-text" id="<?php echo esc_attr( $instance_id ); ?>-title"><?php esc_html_e( 'Participant journeys', 'heritaste-mapbox-journey-ui' ); ?></h2>
 			<div class="heritaste-journey-map__canvas" id="<?php echo esc_attr( $instance_id ); ?>" data-journey-map data-payload-id="<?php echo esc_attr( $payload_id ); ?>" role="region" aria-label="<?php esc_attr_e( 'Interactive world map of participant journeys', 'heritaste-mapbox-journey-ui' ); ?>"></div>
+			<aside class="heritaste-map-legend" aria-label="<?php esc_attr_e( 'Map legend', 'heritaste-mapbox-journey-ui' ); ?>">
+				<h3><?php esc_html_e( 'Participant journeys', 'heritaste-mapbox-journey-ui' ); ?></h3>
+				<ul>
+					<?php foreach ( $journeys as $journey ) : ?>
+						<li>
+							<span class="heritaste-map-legend__swatch" style="--heritaste-journey-color: <?php echo esc_attr( $journey['color'] ); ?>" aria-hidden="true"></span>
+							<span><strong><?php echo esc_html( $journey['participant']['name'] ); ?></strong><small><?php echo esc_html( $journey['origin_country'] . ' → ' . $journey['destination_country'] ); ?></small></span>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</aside>
 			<script type="application/json" id="<?php echo esc_attr( $payload_id ); ?>"><?php echo wp_json_encode( $payload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?></script>
 			<div class="heritaste-journey-map__fallback">
 				<h3><?php esc_html_e( 'Journeys and stops', 'heritaste-mapbox-journey-ui' ); ?></h3>

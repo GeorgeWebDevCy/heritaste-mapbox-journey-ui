@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,11 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.2.0 =
+* Separate overlapping journey origins and route lines while preserving source coordinates.
+* Replace numbered markers with accessible location pins.
+* Add a responsive participant journey legend styled for Heritaste.eu.
 
 = 1.1.1 =
 * Add an optional fullscreen shortcode layout for dedicated map pages.
