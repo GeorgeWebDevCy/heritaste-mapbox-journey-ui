@@ -15,6 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Heritaste Mapbox Journey UI
  * Plugin URI:        https://www.georgenicolaou.me/plugins/heritaste-mapbox-journey-ui
+ * Update URI:        https://github.com/GeorgeWebDevCy/heritaste-mapbox-journey-ui
  * Description:       This is a description of the plugin.
  * Version:           1.0.0
  * Author:            George Nicolaou
@@ -36,6 +37,19 @@ if ( ! defined( 'WPINC' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 define( 'HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.0.0' );
+
+/**
+ * Configure updates from the plugin's public GitHub repository.
+ */
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-heritaste-mapbox-journey-ui-updater.php';
+
+add_action(
+	'plugins_loaded',
+	function() {
+		Heritaste_Mapbox_Journey_Ui_Updater::init( __FILE__ );
+	},
+	20
+);
 
 /**
  * The code that runs during plugin activation.
