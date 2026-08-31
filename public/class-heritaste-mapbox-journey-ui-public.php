@@ -114,6 +114,11 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 						</li>
 					<?php endforeach; ?>
 				</ul>
+				<div class="heritaste-map-legend__key" aria-label="<?php esc_attr_e( 'Pin meanings', 'heritaste-mapbox-journey-ui' ); ?>">
+					<span><i class="heritaste-map-legend__pin heritaste-map-legend__pin--start" aria-hidden="true"></i><?php esc_html_e( 'Origin', 'heritaste-mapbox-journey-ui' ); ?></span>
+					<span><i class="heritaste-map-legend__pin heritaste-map-legend__pin--stop" aria-hidden="true"></i><?php esc_html_e( 'Stop', 'heritaste-mapbox-journey-ui' ); ?></span>
+					<span><i class="heritaste-map-legend__pin heritaste-map-legend__pin--end" aria-hidden="true"></i><?php esc_html_e( 'Destination', 'heritaste-mapbox-journey-ui' ); ?></span>
+				</div>
 			</aside>
 			<script type="application/json" id="<?php echo esc_attr( $payload_id ); ?>"><?php echo wp_json_encode( $payload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?></script>
 			<div class="heritaste-journey-map__fallback">

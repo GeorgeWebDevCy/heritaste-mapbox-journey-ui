@@ -60,6 +60,24 @@
 	transform: translate(-50%, -50%);
 }
 
+.heritaste-map-marker--start {
+	border-color: var(--heritaste-marker-color, #c45432);
+	background: var(--heritaste-map-surface);
+}
+
+.heritaste-map-marker--start::after {
+	background: var(--heritaste-marker-color, #c45432);
+}
+
+.heritaste-map-marker--stop {
+	width: 1.72rem;
+	height: 1.72rem;
+}
+
+.heritaste-map-marker--end {
+	box-shadow: 0 0 0 3px rgba(255, 250, 242, 0.88), 0 3px 12px rgba(42, 36, 30, 0.32);
+}
+
 .heritaste-map-marker:hover,
 .heritaste-map-marker:focus-visible {
 	outline: 3px solid var(--heritaste-map-ink);
@@ -121,6 +139,55 @@
 	display: block;
 }
 
+.heritaste-map-legend__key {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 16px;
+	margin-top: 16px;
+	padding-top: 14px;
+	border-top: 1px solid rgba(184, 170, 156, 0.62);
+	color: #5f554d;
+	font-size: 0.72rem;
+	font-weight: 500;
+}
+
+.heritaste-map-legend__key span {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.heritaste-map-legend__pin {
+	display: inline-block;
+	width: 11px;
+	height: 11px;
+	border: 2px solid #d68c28;
+	border-radius: 50% 50% 50% 0;
+	background: #d68c28;
+	transform: rotate(-45deg);
+}
+
+.heritaste-map-legend__pin--start {
+	background: #fffaf2;
+}
+
+.heritaste-map-legend__pin--stop {
+	width: 9px;
+	height: 9px;
+}
+
+.heritaste-map-legend__pin--end {
+	box-shadow: 0 0 0 2px #fffaf2, 0 0 0 3px rgba(214, 140, 40, 0.5);
+}
+
+.heritaste-map-back-button {
+	position: fixed !important;
+	top: 24px !important;
+	right: auto !important;
+	left: 24px !important;
+	z-index: 10 !important;
+}
+
 .heritaste-map-legend strong {
 	color: #2a241e;
 	font-size: 0.9rem;
@@ -176,7 +243,15 @@
 }
 
 .heritaste-journey-map__fallback {
-	margin-top: 1.5rem;
+	position: absolute !important;
+	width: 1px !important;
+	height: 1px !important;
+	padding: 0 !important;
+	margin: -1px !important;
+	overflow: hidden !important;
+	clip: rect(0, 0, 0, 0) !important;
+	white-space: nowrap !important;
+	border: 0 !important;
 }
 
 .heritaste-journey-summary {
@@ -218,6 +293,11 @@
 		width: min(20rem, calc(100% - 32px));
 		max-height: 34vh;
 		padding: 16px;
+	}
+
+	.heritaste-map-back-button {
+		top: 16px !important;
+		left: 16px !important;
 	}
 }
 

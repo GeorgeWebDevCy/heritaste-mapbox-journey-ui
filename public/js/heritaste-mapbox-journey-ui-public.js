@@ -116,10 +116,11 @@
 
 		journey.stops.forEach(function (stop, stopIndex) {
 			var marker = document.createElement('button');
+			var stopType = stopIndex === 0 ? 'start' : (stopIndex === journey.stops.length - 1 ? 'end' : 'stop');
 			marker.type = 'button';
-			marker.className = 'heritaste-map-marker';
+			marker.className = 'heritaste-map-marker heritaste-map-marker--' + stopType;
 			marker.style.setProperty('--heritaste-marker-color', journey.color);
-			marker.setAttribute('aria-label', journey.participant.name + ': ' + stop.title);
+			marker.setAttribute('aria-label', journey.participant.name + ' — ' + (stopType === 'start' ? 'Origin' : (stopType === 'end' ? 'Destination' : 'Stop')) + ': ' + stop.title);
 			marker.setAttribute('title', stop.title);
 
 			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: '320px' })
