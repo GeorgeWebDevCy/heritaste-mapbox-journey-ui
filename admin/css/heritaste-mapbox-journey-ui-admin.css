@@ -2,3 +2,15 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+.heritaste-demo-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+}
+
+.heritaste-demo-actions form,
+.heritaste-demo-actions p.submit {
+	margin: 0;
+}

@@ -4,11 +4,12 @@ $root        = dirname( __DIR__ );
 $main        = file_get_contents( $root . '/heritaste-mapbox-journey-ui.php' );
 $core        = file_get_contents( $root . '/includes/class-heritaste-mapbox-journey-ui.php' );
 $admin       = file_get_contents( $root . '/admin/class-heritaste-mapbox-journey-ui-admin.php' );
+$admin_view  = file_get_contents( $root . '/admin/partials/heritaste-mapbox-journey-ui-admin-display.php' );
 $public      = file_get_contents( $root . '/public/class-heritaste-mapbox-journey-ui-public.php' );
 $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-ui-public.js' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.3.0" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.4.0" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -30,6 +31,13 @@ $expectations = array(
 	'Live public style selector'   => array( $public, 'data-map-style-selector' ),
 	'Live Mapbox style change'     => array( $javascript, 'map.setStyle(nextStyle)' ),
 	'Route restoration after style'=> array( $javascript, "map.once('style.load'" ),
+	'Demo generation action'       => array( $core, 'admin_post_heritaste_generate_demo_data' ),
+	'Demo deletion action'         => array( $core, 'admin_post_heritaste_delete_demo_data' ),
+	'Demo capability protection'   => array( $admin, "current_user_can( 'manage_options' )" ),
+	'Demo nonce protection'        => array( $admin, 'check_admin_referer( $nonce_action )' ),
+	'Demo deletion marker'         => array( $admin, "'_heritaste_demo_data'" ),
+	'Generate demo button'         => array( $admin_view, 'Generate Demo Data' ),
+	'Delete demo button'           => array( $admin_view, 'Delete Demo Data' ),
 );
 
 foreach ( $expectations as $label => $expectation ) {

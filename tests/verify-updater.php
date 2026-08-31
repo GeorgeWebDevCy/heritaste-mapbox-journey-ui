@@ -18,7 +18,7 @@ if ( ! is_file( $parsedown ) ) {
 $main_source = file_get_contents( $main );
 $updater_source = file_get_contents( $updater );
 $expectations = array(
-	'Plugin version header' => array( $main_source, 'Version:           1.3.0' ),
+	'Plugin version header' => array( $main_source, 'Version:           1.4.0' ),
 	'Update URI header' => array( $main_source, 'Update URI:        https://github.com/GeorgeWebDevCy/heritaste-mapbox-journey-ui' ),
 	'plugins_loaded bootstrap' => array( $main_source, "'plugins_loaded'" ),
 	'GitHub repository' => array( $updater_source, 'https://github.com/GeorgeWebDevCy/heritaste-mapbox-journey-ui/' ),

@@ -158,6 +158,8 @@ class Heritaste_Mapbox_Journey_Ui {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_settings_page' );
 		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
+		$this->loader->add_action( 'admin_post_heritaste_generate_demo_data', $plugin_admin, 'generate_demo_data' );
+		$this->loader->add_action( 'admin_post_heritaste_delete_demo_data', $plugin_admin, 'delete_demo_data' );
 
 	}
 

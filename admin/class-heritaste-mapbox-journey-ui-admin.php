@@ -204,6 +204,159 @@ class Heritaste_Mapbox_Journey_Ui_Admin {
 		require plugin_dir_path( __FILE__ ) . 'partials/heritaste-mapbox-journey-ui-admin-display.php';
 	}
 
+	/**
+	 * Create the fictional participant and journey records used for map testing.
+	 */
+	public function generate_demo_data() {
+		$this->authorize_demo_action( 'heritaste_generate_demo_data' );
+
+		if ( ! function_exists( 'update_field' ) ) {
+			$this->redirect_demo_status( 'acf_missing' );
+		}
+
+		if ( $this->get_demo_post_ids() ) {
+			$this->redirect_demo_status( 'already_exists' );
+		}
+
+		$created_ids = array();
+		foreach ( $this->get_demo_journeys() as $demo ) {
+			$participant_id = wp_insert_post(
+				array(
+					'post_type'   => 'ht_participant',
+					'post_status' => 'publish',
+					'post_title'  => $demo['participant'],
+				),
+				true
+			);
+
+			if ( is_wp_error( $participant_id ) ) {
+				$this->delete_post_ids( $created_ids );
+				$this->redirect_demo_status( 'error' );
+			}
+
+			$created_ids[] = $participant_id;
+			update_post_meta( $participant_id, '_heritaste_demo_data', '1' );
+			update_field( 'participant_biography', $demo['biography'], $participant_id );
+
+			$journey_id = wp_insert_post(
+				array(
+					'post_type'   => 'ht_journey',
+					'post_status' => 'publish',
+					'post_title'  => $demo['journey'],
+				),
+				true
+			);
+
+			if ( is_wp_error( $journey_id ) ) {
+				$this->delete_post_ids( $created_ids );
+				$this->redirect_demo_status( 'error' );
+			}
+
+			$created_ids[] = $journey_id;
+			update_post_meta( $journey_id, '_heritaste_demo_data', '1' );
+			update_field( 'journey_participant', $participant_id, $journey_id );
+			update_field( 'origin_country', $demo['origin'], $journey_id );
+			update_field( 'destination_country', $demo['destination'], $journey_id );
+			update_field( 'journey_color', $demo['color'], $journey_id );
+			update_field( 'journey_stops', $demo['stops'], $journey_id );
+		}
+
+		$this->redirect_demo_status( 'created', count( $created_ids ) );
+	}
+
+	/**
+	 * Permanently delete only records carrying the plugin's demo marker.
+	 */
+	public function delete_demo_data() {
+		$this->authorize_demo_action( 'heritaste_delete_demo_data' );
+		$ids = $this->get_demo_post_ids();
+		$this->delete_post_ids( $ids );
+		$this->redirect_demo_status( 'deleted', count( $ids ) );
+	}
+
+	public function get_demo_post_ids() {
+		return get_posts(
+			array(
+				'post_type'      => array( 'ht_participant', 'ht_journey' ),
+				'post_status'    => 'any',
+				'posts_per_page' => -1,
+				'meta_key'       => '_heritaste_demo_data',
+				'meta_value'     => '1',
+				'fields'         => 'ids',
+			)
+		);
+	}
+
+	private function authorize_demo_action( $nonce_action ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to manage Heritaste demo data.', 'heritaste-mapbox-journey-ui' ) );
+		}
+		check_admin_referer( $nonce_action );
+	}
+
+	private function delete_post_ids( $ids ) {
+		foreach ( $ids as $post_id ) {
+			wp_delete_post( absint( $post_id ), true );
+		}
+	}
+
+	private function redirect_demo_status( $status, $count = 0 ) {
+		$url = add_query_arg(
+			array(
+				'page'                  => $this->plugin_name,
+				'heritaste_demo_status' => sanitize_key( $status ),
+				'heritaste_demo_count'  => absint( $count ),
+			),
+			admin_url( 'options-general.php' )
+		);
+		wp_safe_redirect( $url );
+		exit;
+	}
+
+	private function get_demo_journeys() {
+		return array(
+			array(
+				'participant' => '[Demo] Asha',
+				'biography'   => 'Fictional demo participant used to test the Heritaste journey map.',
+				'journey'     => '[Demo] Asha - Nepal to Cyprus',
+				'origin'      => 'Nepal',
+				'destination' => 'Cyprus',
+				'color'       => '#c45432',
+				'stops'       => array(
+					array( 'stop_title' => 'Kathmandu, Nepal', 'stop_latitude' => 27.7172, 'stop_longitude' => 85.3240, 'stop_story' => 'The demo journey begins in Kathmandu, where family recipes and familiar flavours connect Asha to home.', 'stop_photo' => '', 'stop_audio' => '' ),
+					array( 'stop_title' => 'Doha, Qatar', 'stop_latitude' => 25.2854, 'stop_longitude' => 51.5310, 'stop_story' => 'A short stop in Doha marks the middle of the journey and the anticipation of a new beginning.', 'stop_photo' => '', 'stop_audio' => '' ),
+					array( 'stop_title' => 'Larnaca, Cyprus', 'stop_latitude' => 34.9003, 'stop_longitude' => 33.6232, 'stop_story' => 'The journey reaches Cyprus, where new experiences meet memories carried from Nepal.', 'stop_photo' => '', 'stop_audio' => '' ),
+				),
+			),
+			array(
+				'participant' => '[Demo] Milan',
+				'biography'   => 'Fictional demo participant used to test multiple routes on the shared world map.',
+				'journey'     => '[Demo] Milan - Nepal to Greece',
+				'origin'      => 'Nepal',
+				'destination' => 'Greece',
+				'color'       => '#2f6f8f',
+				'stops'       => array(
+					array( 'stop_title' => 'Pokhara, Nepal', 'stop_latitude' => 28.2096, 'stop_longitude' => 83.9856, 'stop_story' => 'Milan leaves Pokhara carrying stories, traditions, and favourite foods from home.', 'stop_photo' => '', 'stop_audio' => '' ),
+					array( 'stop_title' => 'Istanbul, Turkey', 'stop_latitude' => 41.0082, 'stop_longitude' => 28.9784, 'stop_story' => 'Istanbul becomes a meeting point between regions, cultures, and stages of the journey.', 'stop_photo' => '', 'stop_audio' => '' ),
+					array( 'stop_title' => 'Athens, Greece', 'stop_latitude' => 37.9838, 'stop_longitude' => 23.7275, 'stop_story' => 'In Athens, Milan begins building a new chapter while keeping close ties to Nepal.', 'stop_photo' => '', 'stop_audio' => '' ),
+				),
+			),
+			array(
+				'participant' => '[Demo] Tara',
+				'biography'   => 'Fictional demo participant used to test map pins, routes, and accessible fallback content.',
+				'journey'     => '[Demo] Tara - Nepal to Italy',
+				'origin'      => 'Nepal',
+				'destination' => 'Italy',
+				'color'       => '#5f7d3c',
+				'stops'       => array(
+					array( 'stop_title' => 'Kathmandu, Nepal', 'stop_latitude' => 27.7172, 'stop_longitude' => 85.3240, 'stop_story' => 'Tara starts in Kathmandu with memories of family meals and community celebrations.', 'stop_photo' => '', 'stop_audio' => '' ),
+					array( 'stop_title' => 'Dubai, United Arab Emirates', 'stop_latitude' => 25.2048, 'stop_longitude' => 55.2708, 'stop_story' => 'Dubai is an intermediate stop, represented as a second pin on the demo route.', 'stop_photo' => '', 'stop_audio' => '' ),
+					array( 'stop_title' => 'Rome, Italy', 'stop_latitude' => 41.9028, 'stop_longitude' => 12.4964, 'stop_story' => 'Rome is the final destination, connecting Tara’s past experiences with a new home.', 'stop_photo' => '', 'stop_audio' => '' ),
+				),
+			),
+		);
+	}
+
 	private function is_settings_page() {
 		return isset( $_GET['page'] ) && $this->plugin_name === sanitize_key( wp_unslash( $_GET['page'] ) );
 	}

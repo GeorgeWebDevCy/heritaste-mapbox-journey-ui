@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,10 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.4.0 =
+* Add secure Generate Demo Data and Delete Demo Data controls to the plugin settings page.
+* Prevent duplicate demo sets and scope deletion to explicitly marked demo records.
 
 = 1.3.0 =
 * Add an accessible public selector for changing Mapbox styles without reloading the page.
