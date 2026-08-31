@@ -63,7 +63,15 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 	/**
 	 * Render one world map containing every published journey.
 	 */
-	public function render_map_shortcode() {
+	public function render_map_shortcode( $atts = array() ) {
+		$atts = shortcode_atts(
+			array(
+				'layout' => 'contained',
+			),
+			$atts,
+			'heritaste_journey_map'
+		);
+		$is_fullscreen = 'fullscreen' === sanitize_key( $atts['layout'] );
 		$token = (string) get_option( 'heritaste_mapbox_access_token', '' );
 
 		if ( '' === $token ) {
@@ -93,7 +101,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 
 		ob_start();
 		?>
-		<section class="heritaste-journey-map" aria-labelledby="<?php echo esc_attr( $instance_id ); ?>-title">
+		<section class="heritaste-journey-map<?php echo $is_fullscreen ? ' heritaste-journey-map--fullscreen' : ''; ?>" aria-labelledby="<?php echo esc_attr( $instance_id ); ?>-title">
 			<h2 class="screen-reader-text" id="<?php echo esc_attr( $instance_id ); ?>-title"><?php esc_html_e( 'Participant journeys', 'heritaste-mapbox-journey-ui' ); ?></h2>
 			<div class="heritaste-journey-map__canvas" id="<?php echo esc_attr( $instance_id ); ?>" data-journey-map data-payload-id="<?php echo esc_attr( $payload_id ); ?>" role="region" aria-label="<?php esc_attr_e( 'Interactive world map of participant journeys', 'heritaste-mapbox-journey-ui' ); ?>"></div>
 			<script type="application/json" id="<?php echo esc_attr( $payload_id ); ?>"><?php echo wp_json_encode( $payload, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?></script>

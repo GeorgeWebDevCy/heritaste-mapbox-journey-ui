@@ -8,7 +8,7 @@ $public      = file_get_contents( $root . '/public/class-heritaste-mapbox-journe
 $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-ui-public.js' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.1.0" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.1.1" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -17,6 +17,7 @@ $expectations = array(
 	'ACF participant relationship' => array( $public, "get_field( 'journey_participant'" ),
 	'ACF stop repeater'            => array( $public, "get_field( 'journey_stops'" ),
 	'Accessible audio fallback'    => array( $public, '<audio controls preload="none"' ),
+	'Fullscreen shortcode layout'  => array( $public, "'fullscreen' === sanitize_key" ),
 	'GeoJSON route'                => array( $javascript, "type: 'LineString'" ),
 	'Keyboard-labelled marker'     => array( $javascript, "marker.setAttribute('aria-label'" ),
 );

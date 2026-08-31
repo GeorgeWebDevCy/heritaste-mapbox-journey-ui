@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,6 +14,7 @@ Mapbox-powered journey and heritage-map interface for Heritaste.eu.
 Heritaste Mapbox Journey UI displays every published participant journey together on one interactive Mapbox world map. Journey routes and stops are managed with ACF Pro. Stops can include a photo, story text, and audio recording.
 
 Configure a Mapbox public access token under **Settings → Heritaste Journey Map**, then place `[heritaste_journey_map]` on the map page.
+Use `[heritaste_journey_map layout="fullscreen"]` for a full-width, full-viewport-height map page.
 
 Updates are delivered from the plugin's public GitHub releases.
 
@@ -23,6 +24,9 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.1.1 =
+* Add an optional fullscreen shortcode layout for dedicated map pages.
 
 = 1.1.0 =
 * Add a secure Mapbox public-token and style settings screen.

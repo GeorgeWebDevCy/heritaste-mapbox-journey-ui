@@ -14,6 +14,19 @@
 	border: 1px solid var(--heritaste-map-border);
 }
 
+.heritaste-journey-map--fullscreen,
+.heritaste-journey-map--fullscreen .heritaste-journey-map__canvas {
+	width: 100%;
+	height: 100vh;
+	height: 100dvh;
+	min-height: 100vh;
+	min-height: 100dvh;
+}
+
+.heritaste-journey-map--fullscreen .heritaste-journey-map__canvas {
+	border: 0;
+}
+
 .heritaste-journey-map__canvas:focus-within {
 	outline: 3px solid currentColor;
 	outline-offset: 3px;
