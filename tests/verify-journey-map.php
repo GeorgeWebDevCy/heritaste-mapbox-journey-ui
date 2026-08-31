@@ -8,7 +8,7 @@ $public      = file_get_contents( $root . '/public/class-heritaste-mapbox-journe
 $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-ui-public.js' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.2.3" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.2.4" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -25,6 +25,8 @@ $expectations = array(
 	'Overlapping-point separation' => array( $javascript, 'buildDisplayCoordinates' ),
 	'Location pin marker anchor'   => array( $javascript, "anchor: 'bottom'" ),
 	'Start and end pin semantics'  => array( $javascript, "stopType === 'start'" ),
+	'Data-driven initial viewport' => array( $javascript, 'fitMapToJourneyData' ),
+	'Legend-aware map padding'     => array( $javascript, 'getInitialMapPadding' ),
 );
 
 foreach ( $expectations as $label => $expectation ) {

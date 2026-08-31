@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,10 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.2.4 =
+* Place and style zoom controls in the unobstructed top-right map corner.
+* Calculate the initial viewport from current journey data, screen size, and legend dimensions.
 
 = 1.2.3 =
 * Restore Mapbox's absolute marker positioning so successive pins do not accumulate vertical layout offsets.

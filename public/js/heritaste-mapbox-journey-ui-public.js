@@ -143,6 +143,41 @@
 		});
 	}
 
+	function getInitialMapPadding(container) {
+		var legend = container.parentElement ? container.parentElement.querySelector('.heritaste-map-legend') : null;
+		var legendRect = legend ? legend.getBoundingClientRect() : { width: 0, height: 0 };
+		var isNarrow = container.clientWidth <= 600;
+
+		if (isNarrow) {
+			return {
+				top: 88,
+				right: 48,
+				bottom: Math.min(Math.round(legendRect.height + 32), Math.round(container.clientHeight * 0.42)),
+				left: 32
+			};
+		}
+
+		return {
+			top: 72,
+			right: 72,
+			bottom: 56,
+			left: Math.min(Math.round(legendRect.width + 56), Math.round(container.clientWidth * 0.34))
+		};
+	}
+
+	function fitMapToJourneyData(map, bounds, container) {
+		if (bounds.isEmpty()) {
+			return;
+		}
+
+		map.resize();
+		map.fitBounds(bounds, {
+			padding: getInitialMapPadding(container),
+			maxZoom: 5,
+			duration: 0
+		});
+	}
+
 	function initializeMap(container) {
 		var payloadElement = document.getElementById(container.getAttribute('data-payload-id'));
 		if (!payloadElement) {
@@ -166,7 +201,7 @@
 			projection: 'globe'
 		});
 
-		map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
+		map.addControl(new mapboxgl.NavigationControl({ showCompass: false, visualizePitch: false }), 'top-right');
 		map.scrollZoom.disable();
 
 		map.on('load', function () {
@@ -176,9 +211,9 @@
 				addJourney(map, journey, bounds, index, payload.journeys.length, displayCoordinates);
 			});
 
-			if (!bounds.isEmpty()) {
-				map.fitBounds(bounds, { padding: 56, maxZoom: 5, duration: 0 });
-			}
+			window.requestAnimationFrame(function () {
+				fitMapToJourneyData(map, bounds, container);
+			});
 		});
 
 		map.on('error', function () {
