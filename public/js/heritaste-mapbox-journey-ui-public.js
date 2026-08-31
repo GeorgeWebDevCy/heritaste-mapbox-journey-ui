@@ -80,7 +80,7 @@
 		return positions;
 	}
 
-	function addJourney(map, journey, bounds, index, totalJourneys, displayCoordinates) {
+	function addJourney(map, journey, bounds, index, totalJourneys, displayCoordinates, addMarkers) {
 		var coordinates = displayCoordinates[journey.id] || journey.stops.map(function (stop) {
 			return [stop.longitude, stop.latitude];
 		});
@@ -91,27 +91,35 @@
 
 		if (coordinates.length > 1) {
 			var sourceId = 'heritaste-route-' + journey.id + '-' + index;
-			map.addSource(sourceId, {
-				type: 'geojson',
-				data: {
-					type: 'Feature',
-					properties: { participant: journey.participant.name },
-					geometry: { type: 'LineString', coordinates: coordinates }
-				}
-			});
+			if (!map.getSource(sourceId)) {
+				map.addSource(sourceId, {
+					type: 'geojson',
+					data: {
+						type: 'Feature',
+						properties: { participant: journey.participant.name },
+						geometry: { type: 'LineString', coordinates: coordinates }
+					}
+				});
+			}
 
-			map.addLayer({
-				id: sourceId,
-				type: 'line',
-				source: sourceId,
-				layout: { 'line-cap': 'round', 'line-join': 'round' },
-				paint: {
-					'line-color': journey.color,
-					'line-width': 3,
-					'line-opacity': 0.88,
-					'line-offset': (index - ((totalJourneys - 1) / 2)) * 2
-				}
-			});
+			if (!map.getLayer(sourceId)) {
+				map.addLayer({
+					id: sourceId,
+					type: 'line',
+					source: sourceId,
+					layout: { 'line-cap': 'round', 'line-join': 'round' },
+					paint: {
+						'line-color': journey.color,
+						'line-width': 3,
+						'line-opacity': 0.88,
+						'line-offset': (index - ((totalJourneys - 1) / 2)) * 2
+					}
+				});
+			}
+		}
+
+		if (!addMarkers) {
+			return;
 		}
 
 		journey.stops.forEach(function (stop, stopIndex) {
@@ -185,6 +193,7 @@
 		}
 
 		var payload;
+		var styleSelector = container.parentElement ? container.parentElement.querySelector('[data-map-style-selector]') : null;
 		try {
 			payload = JSON.parse(payloadElement.textContent);
 		} catch (error) {
@@ -208,12 +217,27 @@
 			var bounds = new mapboxgl.LngLatBounds();
 			var displayCoordinates = buildDisplayCoordinates(payload.journeys);
 			payload.journeys.forEach(function (journey, index) {
-				addJourney(map, journey, bounds, index, payload.journeys.length, displayCoordinates);
+				addJourney(map, journey, bounds, index, payload.journeys.length, displayCoordinates, true);
 			});
 
 			window.requestAnimationFrame(function () {
 				fitMapToJourneyData(map, bounds, container);
 			});
+
+			if (styleSelector) {
+				styleSelector.addEventListener('change', function () {
+					var nextStyle = styleSelector.value;
+					styleSelector.disabled = true;
+					map.once('style.load', function () {
+						payload.journeys.forEach(function (journey, index) {
+							addJourney(map, journey, bounds, index, payload.journeys.length, displayCoordinates, false);
+						});
+						container.setAttribute('data-active-map-style', nextStyle);
+						styleSelector.disabled = false;
+					});
+					map.setStyle(nextStyle);
+				});
+			}
 		});
 
 		map.on('error', function () {

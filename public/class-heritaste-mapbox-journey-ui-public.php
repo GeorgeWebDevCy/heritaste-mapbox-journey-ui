@@ -104,6 +104,17 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 		<section class="heritaste-journey-map<?php echo $is_fullscreen ? ' heritaste-journey-map--fullscreen' : ''; ?>" aria-labelledby="<?php echo esc_attr( $instance_id ); ?>-title">
 			<h2 class="screen-reader-text" id="<?php echo esc_attr( $instance_id ); ?>-title"><?php esc_html_e( 'Participant journeys', 'heritaste-mapbox-journey-ui' ); ?></h2>
 			<div class="heritaste-journey-map__canvas" id="<?php echo esc_attr( $instance_id ); ?>" data-journey-map data-payload-id="<?php echo esc_attr( $payload_id ); ?>" role="region" aria-label="<?php esc_attr_e( 'Interactive world map of participant journeys', 'heritaste-mapbox-journey-ui' ); ?>"></div>
+			<div class="heritaste-map-style-switcher">
+				<label for="<?php echo esc_attr( $instance_id ); ?>-style"><?php esc_html_e( 'Map style', 'heritaste-mapbox-journey-ui' ); ?></label>
+				<select id="<?php echo esc_attr( $instance_id ); ?>-style" data-map-style-selector>
+					<option value="<?php echo esc_attr( (string) get_option( 'heritaste_mapbox_style', 'mapbox://styles/mapbox/standard' ) ); ?>"><?php esc_html_e( 'Site default', 'heritaste-mapbox-journey-ui' ); ?></option>
+					<option value="mapbox://styles/mapbox/standard"><?php esc_html_e( 'Standard', 'heritaste-mapbox-journey-ui' ); ?></option>
+					<option value="mapbox://styles/mapbox/standard-satellite"><?php esc_html_e( 'Satellite', 'heritaste-mapbox-journey-ui' ); ?></option>
+					<option value="mapbox://styles/mapbox/streets-v12"><?php esc_html_e( 'Streets', 'heritaste-mapbox-journey-ui' ); ?></option>
+					<option value="mapbox://styles/mapbox/light-v11"><?php esc_html_e( 'Light', 'heritaste-mapbox-journey-ui' ); ?></option>
+					<option value="mapbox://styles/mapbox/dark-v11"><?php esc_html_e( 'Dark', 'heritaste-mapbox-journey-ui' ); ?></option>
+				</select>
+			</div>
 			<aside class="heritaste-map-legend" aria-label="<?php esc_attr_e( 'Map legend', 'heritaste-mapbox-journey-ui' ); ?>">
 				<h3><?php esc_html_e( 'Participant journeys', 'heritaste-mapbox-journey-ui' ); ?></h3>
 				<ul>

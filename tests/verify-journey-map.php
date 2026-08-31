@@ -8,7 +8,7 @@ $public      = file_get_contents( $root . '/public/class-heritaste-mapbox-journe
 $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-ui-public.js' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.2.4" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.3.0" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -27,6 +27,9 @@ $expectations = array(
 	'Start and end pin semantics'  => array( $javascript, "stopType === 'start'" ),
 	'Data-driven initial viewport' => array( $javascript, 'fitMapToJourneyData' ),
 	'Legend-aware map padding'     => array( $javascript, 'getInitialMapPadding' ),
+	'Live public style selector'   => array( $public, 'data-map-style-selector' ),
+	'Live Mapbox style change'     => array( $javascript, 'map.setStyle(nextStyle)' ),
+	'Route restoration after style'=> array( $javascript, "map.once('style.load'" ),
 );
 
 foreach ( $expectations as $label => $expectation ) {

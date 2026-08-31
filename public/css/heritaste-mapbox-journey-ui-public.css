@@ -145,6 +145,50 @@
 	backdrop-filter: blur(10px);
 }
 
+.heritaste-map-style-switcher {
+	position: absolute;
+	z-index: 5;
+	top: 120px;
+	right: 16px;
+	display: grid;
+	gap: 5px;
+	width: 176px;
+	padding: 12px;
+	border: 1px solid rgba(184, 170, 156, 0.72);
+	border-radius: 8px;
+	background: rgba(255, 250, 242, 0.96);
+	box-shadow: 0 8px 24px rgba(42, 36, 30, 0.16);
+	color: #2a241e;
+}
+
+.heritaste-map-style-switcher label {
+	font-size: 0.72rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.heritaste-map-style-switcher select {
+	width: 100%;
+	min-height: 38px;
+	padding: 7px 30px 7px 9px;
+	border: 1px solid #b8aa9c;
+	border-radius: 6px;
+	background-color: #ffffff;
+	color: #2a241e;
+	font: 500 0.85rem/1.2 "Work Sans", Arial, sans-serif;
+}
+
+.heritaste-map-style-switcher select:focus-visible {
+	outline: 3px solid #d68c28;
+	outline-offset: 2px;
+}
+
+.heritaste-map-style-switcher select:disabled {
+	opacity: 0.65;
+	cursor: progress;
+}
+
 .heritaste-map-legend h3 {
 	margin: 0 0 14px;
 	color: #2a241e;
@@ -346,6 +390,12 @@
 	.heritaste-journey-map .mapboxgl-ctrl-top-right {
 		top: 12px;
 		right: 12px;
+	}
+
+	.heritaste-map-style-switcher {
+		top: 116px;
+		right: 12px;
+		width: 166px;
 	}
 }
 
