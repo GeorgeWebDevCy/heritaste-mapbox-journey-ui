@@ -17,7 +17,7 @@
  * Plugin URI:        https://www.georgenicolaou.me/plugins/heritaste-mapbox-journey-ui
  * Update URI:        https://github.com/GeorgeWebDevCy/heritaste-mapbox-journey-ui
  * Description:       This is a description of the plugin.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            George Nicolaou
  * Author URI:        https://www.georgenicolaou.me/
  * License:           GPL-2.0+
@@ -36,7 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.0.0' );
+define( 'HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.0.1' );
 
 /**
  * Configure updates from the plugin's public GitHub repository.
