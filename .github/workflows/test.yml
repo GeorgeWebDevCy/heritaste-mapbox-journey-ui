@@ -16,3 +16,7 @@ jobs:
         run: find . -type f -name '*.php' -not -path './plugin-update-checker/*' -print0 | xargs -0 -n1 php -l
       - name: Verify updater integration
         run: php tests/verify-updater.php
+      - name: Verify journey map integration
+        run: php tests/verify-journey-map.php
+      - name: Check JavaScript syntax
+        run: node --check public/js/heritaste-mapbox-journey-ui-public.js

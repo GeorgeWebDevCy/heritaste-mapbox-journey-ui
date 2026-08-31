@@ -1,4 +1,128 @@
-/**
- * All of the CSS for your public-facing functionality should be
- * included in this file.
- */
+.heritaste-journey-map {
+	--heritaste-map-ink: #202722;
+	--heritaste-map-surface: #ffffff;
+	--heritaste-map-border: #ccd4ce;
+	color: var(--heritaste-map-ink);
+	font: inherit;
+}
+
+.heritaste-journey-map__canvas {
+	width: 100%;
+	min-height: 32rem;
+	height: min(72vh, 48rem);
+	background: #e8eeea;
+	border: 1px solid var(--heritaste-map-border);
+}
+
+.heritaste-journey-map__canvas:focus-within {
+	outline: 3px solid currentColor;
+	outline-offset: 3px;
+}
+
+.heritaste-map-marker {
+	display: grid;
+	place-items: center;
+	width: 2rem;
+	height: 2rem;
+	padding: 0;
+	border: 2px solid var(--heritaste-map-surface);
+	border-radius: 50%;
+	background: var(--heritaste-marker-color, #c45432);
+	box-shadow: 0 2px 8px rgba(32, 39, 34, 0.28);
+	color: #ffffff;
+	font: 700 0.75rem/1 sans-serif;
+	cursor: pointer;
+}
+
+.heritaste-map-marker:hover,
+.heritaste-map-marker:focus-visible {
+	outline: 3px solid var(--heritaste-map-ink);
+	outline-offset: 2px;
+	transform: scale(1.08);
+}
+
+.heritaste-map-popup {
+	max-width: 18rem;
+	color: var(--heritaste-map-ink);
+}
+
+.heritaste-map-popup__image {
+	display: block;
+	width: 100%;
+	max-height: 11rem;
+	object-fit: cover;
+	margin: 0 0 0.75rem;
+}
+
+.heritaste-map-popup__participant {
+	margin: 0 0 0.25rem;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.heritaste-map-popup__title {
+	margin: 0 0 0.5rem;
+	font: inherit;
+	font-size: 1.1rem;
+	font-weight: 700;
+	line-height: 1.15;
+}
+
+.heritaste-map-popup__story {
+	max-width: 65ch;
+	margin: 0 0 0.75rem;
+	line-height: 1.55;
+}
+
+.heritaste-map-popup audio,
+.heritaste-journey-summary audio {
+	display: block;
+	width: 100%;
+	margin-top: 0.75rem;
+}
+
+.heritaste-journey-map__fallback {
+	margin-top: 1.5rem;
+}
+
+.heritaste-journey-summary {
+	padding: 1rem 0;
+	border-top: 1px solid var(--heritaste-map-border);
+}
+
+.heritaste-journey-summary h4,
+.heritaste-journey-summary p {
+	margin-top: 0;
+}
+
+.heritaste-journey-summary li + li {
+	margin-top: 1rem;
+}
+
+.heritaste-map-notice {
+	padding: 1rem;
+	border-left: 4px solid currentColor;
+}
+
+.heritaste-journey-map__canvas--error::after {
+	content: "The interactive map could not be loaded. The journey list remains available below.";
+	display: block;
+	max-width: 36rem;
+	padding: 1rem;
+	background: var(--heritaste-map-surface);
+}
+
+@media (max-width: 600px) {
+	.heritaste-journey-map__canvas {
+		min-height: 25rem;
+		height: 65vh;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.heritaste-map-marker {
+		transition: none;
+	}
+}

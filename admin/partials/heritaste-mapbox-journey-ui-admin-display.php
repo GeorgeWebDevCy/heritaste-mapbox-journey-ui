@@ -1,16 +1,23 @@
 <?php
-
 /**
- * Provide a admin area view for the plugin
+ * Settings page markup.
  *
- * This file is used to markup the admin-facing aspects of the plugin.
- *
- * @link       https://www.georgenicolaou.me
- * @since      1.0.0
- *
- * @package    Heritaste_Mapbox_Journey_Ui
- * @subpackage Heritaste_Mapbox_Journey_Ui/admin/partials
+ * @package Heritaste_Mapbox_Journey_Ui
  */
 ?>
-
-<!-- This file should primarily consist of HTML with a little bit of PHP. -->
+<div class="wrap heritaste-mapbox-settings">
+	<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+	<p><?php esc_html_e( 'Configure the shared world map used to display all participant journeys.', 'heritaste-mapbox-journey-ui' ); ?></p>
+	<?php settings_errors(); ?>
+	<form method="post" action="options.php">
+		<?php
+		settings_fields( 'heritaste_mapbox_journey_ui' );
+		do_settings_sections( 'heritaste-mapbox-journey-ui' );
+		submit_button();
+		?>
+	</form>
+	<hr />
+	<h2><?php esc_html_e( 'Map shortcode', 'heritaste-mapbox-journey-ui' ); ?></h2>
+	<p><?php esc_html_e( 'Add this shortcode to the page where the shared participant map should appear:', 'heritaste-mapbox-journey-ui' ); ?></p>
+	<p><code>[heritaste_journey_map]</code></p>
+</div>

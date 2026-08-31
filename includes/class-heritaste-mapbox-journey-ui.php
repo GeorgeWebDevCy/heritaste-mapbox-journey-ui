@@ -70,7 +70,7 @@ class Heritaste_Mapbox_Journey_Ui {
 		if ( defined( 'HERITASTE_MAPBOX_JOURNEY_UI_VERSION' ) ) {
 			$this->version = HERITASTE_MAPBOX_JOURNEY_UI_VERSION;
 		} else {
-			$this->version = '1.0.0';
+			$this->version = '1.1.0';
 		}
 		$this->plugin_name = 'heritaste-mapbox-journey-ui';
 
@@ -156,6 +156,8 @@ class Heritaste_Mapbox_Journey_Ui {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_settings_page' );
+		$this->loader->add_action( 'admin_init', $plugin_admin, 'register_settings' );
 
 	}
 
@@ -172,6 +174,7 @@ class Heritaste_Mapbox_Journey_Ui {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action( 'init', $plugin_public, 'register_shortcode' );
 
 	}
 
