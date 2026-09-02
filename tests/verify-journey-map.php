@@ -9,7 +9,7 @@ $public      = file_get_contents( $root . '/public/class-heritaste-mapbox-journe
 $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-ui-public.js' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.6.2" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.6.3" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -47,6 +47,10 @@ foreach ( $expectations as $label => $expectation ) {
 	if ( false === strpos( $expectation[0], $expectation[1] ) ) {
 		$failures[] = $label . ' is not configured as expected.';
 	}
+}
+
+if ( false !== strpos( $javascript, "addEventListener('mouseenter'" ) || false !== strpos( $javascript, "addEventListener('focus'" ) ) {
+	$failures[] = 'Markers must not open popups on hover or focus.';
 }
 
 if ( $failures ) {

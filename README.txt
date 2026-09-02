@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,9 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.6.3 =
+* Open journey popups only when a marker is clicked or keyboard-activated, not on hover or focus.
 
 = 1.6.2 =
 * Keep widened desktop popups centered inside the viewport with internal scrolling for long stories.

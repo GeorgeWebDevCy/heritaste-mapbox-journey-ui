@@ -146,21 +146,10 @@
 
 			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: window.innerWidth <= 600 ? 'calc(100vw - 32px)' : '480px' })
 				.setDOMContent(createPopupContent(journey, stop));
-			var mapMarker = new mapboxgl.Marker({ element: marker, anchor: 'bottom' })
+			new mapboxgl.Marker({ element: marker, anchor: 'bottom' })
 				.setLngLat(coordinates[stopIndex])
 				.setPopup(popup)
 				.addTo(map);
-
-			marker.addEventListener('mouseenter', function () {
-				if (!popup.isOpen()) {
-					mapMarker.togglePopup();
-				}
-			});
-			marker.addEventListener('focus', function () {
-				if (!popup.isOpen()) {
-					mapMarker.togglePopup();
-				}
-			});
 		});
 	}
 
