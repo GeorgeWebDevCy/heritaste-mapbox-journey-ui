@@ -288,8 +288,14 @@
 }
 
 .heritaste-map-popup {
-	max-width: 18rem;
+	width: 100%;
+	max-width: none;
 	color: var(--heritaste-map-ink);
+}
+
+.heritaste-journey-map .mapboxgl-popup {
+	width: min(480px, calc(100vw - 32px));
+	max-width: none !important;
 }
 
 .heritaste-map-popup__image {
