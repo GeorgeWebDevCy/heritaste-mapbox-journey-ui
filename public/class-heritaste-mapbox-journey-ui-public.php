@@ -144,6 +144,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 									<strong><?php echo esc_html( $stop['title'] ); ?></strong>
 									<?php if ( '' !== $stop['story'] ) : ?><p><?php echo esc_html( $stop['story'] ); ?></p><?php endif; ?>
 									<?php if ( '' !== $stop['audio'] ) : ?><audio controls preload="none" src="<?php echo esc_url( $stop['audio'] ); ?>"></audio><?php endif; ?>
+									<?php if ( '' !== $stop['document'] ) : ?><p><a href="<?php echo esc_url( $stop['document'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $stop['document_label'] ); ?></a></p><?php endif; ?>
 								</li>
 							<?php endforeach; ?>
 						</ol>
@@ -223,7 +224,9 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 					'longitude' => $longitude,
 					'photo'     => $this->get_media_url( $stop['stop_photo'] ?? '' ),
 					'story'     => wp_strip_all_tags( $stop['stop_story'] ?? '' ),
-					'audio'     => $this->get_media_url( $stop['stop_audio'] ?? '' ),
+							'audio'     => $this->get_media_url( $stop['stop_audio'] ?? '' ),
+							'document'  => $this->get_media_url( $stop['stop_document'] ?? '' ),
+							'document_label' => sanitize_text_field( $stop['stop_document_label'] ?? __( 'View supporting document', 'heritaste-mapbox-journey-ui' ) ),
 				);
 			}
 		}
@@ -243,6 +246,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 				'name'      => $participant_id ? get_the_title( $participant_id ) : get_the_title( $post_id ),
 				'portrait'  => $participant_id ? $this->get_media_url( get_field( 'participant_portrait', $participant_id ) ) : '',
 				'biography' => $participant_id ? wp_strip_all_tags( get_field( 'participant_biography', $participant_id ) ) : '',
+				'age'       => $participant_id ? absint( get_field( 'participant_age', $participant_id ) ) : 0,
 			),
 			'stops'               => $stops,
 		);

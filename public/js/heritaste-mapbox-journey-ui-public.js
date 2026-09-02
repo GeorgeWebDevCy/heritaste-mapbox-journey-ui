@@ -24,6 +24,9 @@
 		}
 
 		content.appendChild(createTextElement('p', 'heritaste-map-popup__participant', journey.participant.name));
+		if (journey.participant.age) {
+			content.appendChild(createTextElement('p', 'heritaste-map-popup__meta', 'Age ' + journey.participant.age));
+		}
 		content.appendChild(createTextElement('h3', 'heritaste-map-popup__title', stop.title));
 
 		if (stop.story) {
@@ -37,6 +40,16 @@
 			audio.src = stop.audio;
 			audio.setAttribute('aria-label', 'Audio for ' + stop.title);
 			content.appendChild(audio);
+		}
+
+		if (stop.document) {
+			var documentLink = document.createElement('a');
+			documentLink.className = 'heritaste-map-popup__document';
+			documentLink.href = stop.document;
+			documentLink.target = '_blank';
+			documentLink.rel = 'noopener noreferrer';
+			documentLink.textContent = stop.document_label || 'View supporting document';
+			content.appendChild(documentLink);
 		}
 
 		return content;

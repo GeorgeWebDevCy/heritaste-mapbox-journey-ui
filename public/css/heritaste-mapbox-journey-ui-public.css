@@ -308,6 +308,12 @@
 	text-transform: uppercase;
 }
 
+.heritaste-map-popup__meta {
+	margin: -0.1rem 0 0.55rem;
+	color: #5f554d;
+	font-size: 0.78rem;
+}
+
 .heritaste-map-popup__title {
 	margin: 0 0 0.5rem;
 	font: inherit;
@@ -327,6 +333,26 @@
 	display: block;
 	width: 100%;
 	margin-top: 0.75rem;
+}
+
+.heritaste-map-popup__document {
+	display: inline-flex;
+	align-items: center;
+	min-height: 2.5rem;
+	padding: 0.65rem 0.9rem;
+	margin-top: 0.25rem;
+	border-radius: 999px;
+	background: var(--heritaste-map-ink);
+	color: #fff;
+	font-size: 0.82rem;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.heritaste-map-popup__document:hover,
+.heritaste-map-popup__document:focus-visible {
+	background: #c45432;
+	color: #fff;
 }
 
 .heritaste-journey-map__fallback {
