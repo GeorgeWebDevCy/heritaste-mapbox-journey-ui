@@ -146,7 +146,7 @@
 
 			var popupOptions = { offset: 20, closeButton: true, maxWidth: window.innerWidth <= 600 ? '200px' : '320px' };
 			if (window.innerWidth <= 600) {
-				popupOptions.anchor = 'top';
+				popupOptions.anchor = 'bottom';
 			}
 			var popup = new mapboxgl.Popup(popupOptions)
 				.setDOMContent(createPopupContent(journey, stop));
