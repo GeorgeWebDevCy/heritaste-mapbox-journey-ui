@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.5.6
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,10 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.6.0 =
+* Widen desktop story popups to reduce excessive text wrapping.
+* Present phone popups as a nearly full-width, scrollable overlay that remains entirely on screen.
 
 = 1.5.6 =
 * Open phone popups beneath their marker so the participant header starts inside the viewport.

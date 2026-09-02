@@ -400,9 +400,22 @@
 	}
 
 	.heritaste-journey-map .mapboxgl-popup-content {
-		max-height: 58vh;
+		max-height: 68vh;
 		overflow-y: auto;
 		overscroll-behavior: contain;
+	}
+
+	.heritaste-journey-map .mapboxgl-popup {
+		position: fixed;
+		top: 104px;
+		left: 16px;
+		width: calc(100vw - 32px);
+		max-width: none !important;
+		transform: none !important;
+	}
+
+	.heritaste-journey-map .mapboxgl-popup-tip {
+		display: none;
 	}
 
 	.heritaste-journey-map__canvas {

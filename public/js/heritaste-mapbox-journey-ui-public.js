@@ -144,11 +144,7 @@
 			marker.setAttribute('aria-label', journey.participant.name + ' — ' + (stopType === 'start' ? 'Origin' : (stopType === 'end' ? 'Destination' : 'Stop')) + ': ' + stop.title);
 			marker.setAttribute('title', stop.title);
 
-			var popupOptions = { offset: 20, closeButton: true, maxWidth: window.innerWidth <= 600 ? '200px' : '320px' };
-			if (window.innerWidth <= 600) {
-				popupOptions.anchor = 'bottom';
-			}
-			var popup = new mapboxgl.Popup(popupOptions)
+			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: window.innerWidth <= 600 ? 'calc(100vw - 32px)' : '480px' })
 				.setDOMContent(createPopupContent(journey, stop));
 			var mapMarker = new mapboxgl.Marker({ element: marker, anchor: 'bottom' })
 				.setLngLat(coordinates[stopIndex])
