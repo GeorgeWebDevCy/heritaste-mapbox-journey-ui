@@ -82,7 +82,7 @@
 				}
 
 				var angle = (Math.PI * 2 * occurrence / total) - (Math.PI / 2);
-				var radius = 0.22;
+				var radius = 1.4;
 				return [
 					Number(stop.longitude) + (Math.cos(angle) * radius),
 					Number(stop.latitude) + (Math.sin(angle) * radius)
