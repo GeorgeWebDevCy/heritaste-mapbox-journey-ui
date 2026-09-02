@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.5.2
+Stable tag: 1.5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,10 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.5.3 =
+* Constrain long map popups on phones and keep their content internally scrollable.
+* Temporarily hide the mobile legend while a popup is open to preserve reading space.
 
 = 1.5.2 =
 * Keep shared-location narrative pins independently interactive on narrow mobile maps.

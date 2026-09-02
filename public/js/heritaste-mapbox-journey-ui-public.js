@@ -144,7 +144,7 @@
 			marker.setAttribute('aria-label', journey.participant.name + ' — ' + (stopType === 'start' ? 'Origin' : (stopType === 'end' ? 'Destination' : 'Stop')) + ': ' + stop.title);
 			marker.setAttribute('title', stop.title);
 
-			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: '320px' })
+			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: window.innerWidth <= 600 ? '240px' : '320px' })
 				.setDOMContent(createPopupContent(journey, stop));
 			var mapMarker = new mapboxgl.Marker({ element: marker, anchor: 'bottom' })
 				.setLngLat(coordinates[stopIndex])

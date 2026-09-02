@@ -395,6 +395,16 @@
 }
 
 @media (max-width: 600px) {
+	.heritaste-journey-map:has(.mapboxgl-popup) .heritaste-map-legend {
+		display: none;
+	}
+
+	.heritaste-journey-map .mapboxgl-popup-content {
+		max-height: 58vh;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
 	.heritaste-journey-map__canvas {
 		min-height: 25rem;
 		height: 65vh;
