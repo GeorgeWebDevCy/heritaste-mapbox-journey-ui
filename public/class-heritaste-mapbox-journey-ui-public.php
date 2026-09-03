@@ -128,6 +128,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 				<div class="heritaste-map-legend__key" aria-label="<?php esc_attr_e( 'Pin meanings', 'heritaste-mapbox-journey-ui' ); ?>">
 					<span><i class="heritaste-map-legend__pin heritaste-map-legend__pin--start" aria-hidden="true"></i><?php esc_html_e( 'Origin', 'heritaste-mapbox-journey-ui' ); ?></span>
 					<span><i class="heritaste-map-legend__pin heritaste-map-legend__pin--stop" aria-hidden="true"></i><?php esc_html_e( 'Stop', 'heritaste-mapbox-journey-ui' ); ?></span>
+					<span><i class="heritaste-map-legend__recipe" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><circle cx="32" cy="32" r="18"/><circle cx="32" cy="32" r="12"/><path d="M10 12v14m5-14v14m-5-7h5m-2.5 7v26M51 12c-6 7-7 15-4 21h4v19"/></svg></i><?php esc_html_e( 'Recipe', 'heritaste-mapbox-journey-ui' ); ?></span>
 					<span><i class="heritaste-map-legend__pin heritaste-map-legend__pin--end" aria-hidden="true"></i><?php esc_html_e( 'Destination', 'heritaste-mapbox-journey-ui' ); ?></span>
 				</div>
 			</aside>

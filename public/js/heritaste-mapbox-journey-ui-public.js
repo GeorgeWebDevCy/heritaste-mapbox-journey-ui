@@ -91,6 +91,67 @@
 		return Number(stop.longitude).toFixed(4) + ',' + Number(stop.latitude).toFixed(4);
 	}
 
+	function isRecipeStop(stop) {
+		return Boolean(stop.document) && /recipe/i.test((stop.document_label || '') + ' ' + (stop.title || ''));
+	}
+
+	function getRouteMidpoint(coordinates) {
+		var lengths = [];
+		var totalLength = 0;
+
+		for (var index = 1; index < coordinates.length; index += 1) {
+			var longitudeDelta = coordinates[index][0] - coordinates[index - 1][0];
+			var latitudeDelta = coordinates[index][1] - coordinates[index - 1][1];
+			var length = Math.sqrt((longitudeDelta * longitudeDelta) + (latitudeDelta * latitudeDelta));
+			lengths.push(length);
+			totalLength += length;
+		}
+
+		if (!totalLength) {
+			return coordinates[0];
+		}
+
+		var remaining = totalLength / 2;
+		for (var segment = 0; segment < lengths.length; segment += 1) {
+			if (remaining <= lengths[segment] && lengths[segment] > 0) {
+				var ratio = remaining / lengths[segment];
+				return [
+					coordinates[segment][0] + ((coordinates[segment + 1][0] - coordinates[segment][0]) * ratio),
+					coordinates[segment][1] + ((coordinates[segment + 1][1] - coordinates[segment][1]) * ratio)
+				];
+			}
+			remaining -= lengths[segment];
+		}
+
+		return coordinates[coordinates.length - 1];
+	}
+
+	function createRecipeMarkerIcon() {
+		var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		var plate = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+		var plateInner = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+		var fork = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		var knife = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+		icon.setAttribute('viewBox', '0 0 64 64');
+		icon.setAttribute('aria-hidden', 'true');
+		icon.setAttribute('focusable', 'false');
+		plate.setAttribute('cx', '32');
+		plate.setAttribute('cy', '32');
+		plate.setAttribute('r', '18');
+		plateInner.setAttribute('cx', '32');
+		plateInner.setAttribute('cy', '32');
+		plateInner.setAttribute('r', '12');
+		fork.setAttribute('d', 'M10 12v14m5-14v14m-5-7h5m-2.5 7v26');
+		knife.setAttribute('d', 'M51 12c-6 7-7 15-4 21h4v19');
+		icon.appendChild(plate);
+		icon.appendChild(plateInner);
+		icon.appendChild(fork);
+		icon.appendChild(knife);
+
+		return icon;
+	}
+
 	function buildDisplayCoordinates(journeys) {
 		var occurrences = {};
 		var positions = {};
@@ -126,15 +187,16 @@
 	}
 
 	function addJourney(map, journey, bounds, index, totalJourneys, displayCoordinates, addMarkers) {
-		var coordinates = displayCoordinates[journey.id] || journey.stops.map(function (stop) {
+		var routeCoordinates = journey.stops.map(function (stop) {
 			return [stop.longitude, stop.latitude];
 		});
+		var markerCoordinates = displayCoordinates[journey.id] || routeCoordinates;
 
-		coordinates.forEach(function (coordinate) {
+		routeCoordinates.forEach(function (coordinate) {
 			bounds.extend(coordinate);
 		});
 
-		if (coordinates.length > 1) {
+		if (routeCoordinates.length > 1) {
 			var sourceId = 'heritaste-route-' + journey.id + '-' + index;
 			if (!map.getSource(sourceId)) {
 				map.addSource(sourceId, {
@@ -142,7 +204,7 @@
 					data: {
 						type: 'Feature',
 						properties: { participant: journey.participant.name },
-						geometry: { type: 'LineString', coordinates: coordinates }
+						geometry: { type: 'LineString', coordinates: routeCoordinates }
 					}
 				});
 			}
@@ -169,17 +231,22 @@
 
 		journey.stops.forEach(function (stop, stopIndex) {
 			var marker = document.createElement('button');
-			var stopType = stopIndex === 0 ? 'start' : (stopIndex === journey.stops.length - 1 ? 'end' : 'stop');
+			var recipeStop = isRecipeStop(stop);
+			var stopType = recipeStop ? 'recipe' : (stopIndex === 0 ? 'start' : (stopIndex === journey.stops.length - 1 ? 'end' : 'stop'));
+			var markerCoordinate = recipeStop ? getRouteMidpoint(routeCoordinates) : markerCoordinates[stopIndex];
 			marker.type = 'button';
 			marker.className = 'heritaste-map-marker heritaste-map-marker--' + stopType;
 			marker.style.setProperty('--heritaste-marker-color', journey.color);
-			marker.setAttribute('aria-label', journey.participant.name + ' — ' + (stopType === 'start' ? 'Origin' : (stopType === 'end' ? 'Destination' : 'Stop')) + ': ' + stop.title);
+			marker.setAttribute('aria-label', journey.participant.name + ' — ' + (stopType === 'start' ? 'Origin' : (stopType === 'end' ? 'Destination' : (stopType === 'recipe' ? 'Recipe' : 'Stop'))) + ': ' + stop.title);
 			marker.setAttribute('title', stop.title);
+			if (recipeStop) {
+				marker.appendChild(createRecipeMarkerIcon());
+			}
 
 			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: window.innerWidth <= 600 ? 'calc(100vw - 32px)' : '480px' })
 				.setDOMContent(createPopupContent(journey, stop));
-			new mapboxgl.Marker({ element: marker, anchor: 'bottom' })
-				.setLngLat(coordinates[stopIndex])
+			new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom' })
+				.setLngLat(markerCoordinate)
 				.setPopup(popup)
 				.addTo(map);
 		});

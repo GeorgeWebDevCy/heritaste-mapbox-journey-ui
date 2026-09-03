@@ -109,6 +109,36 @@
 	height: 1.72rem;
 }
 
+.heritaste-map-marker--recipe {
+	width: 2.7rem;
+	height: 2.7rem;
+	border: 2px solid var(--heritaste-map-surface);
+	border-radius: 50%;
+	background: var(--heritaste-marker-color, #c45432);
+	box-shadow: 0 3px 12px rgba(42, 36, 30, 0.34);
+}
+
+.heritaste-map-marker--recipe::before,
+.heritaste-map-marker--recipe::after {
+	display: none;
+}
+
+.heritaste-map-marker--recipe svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+	fill: none;
+	stroke: var(--heritaste-map-surface);
+	stroke-width: 3;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.heritaste-map-marker--recipe:hover,
+.heritaste-map-marker--recipe:focus-visible {
+	filter: brightness(1.08);
+}
+
 .heritaste-map-marker--end {
 	background: transparent;
 }
@@ -265,6 +295,24 @@
 
 .heritaste-map-legend__pin--end {
 	box-shadow: 0 0 0 2px #fffaf2, 0 0 0 3px rgba(214, 140, 40, 0.5);
+}
+
+.heritaste-map-legend__recipe {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	color: #d68c28;
+}
+
+.heritaste-map-legend__recipe svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 3;
+	stroke-linecap: round;
+	stroke-linejoin: round;
 }
 
 .heritaste-map-back-button {
