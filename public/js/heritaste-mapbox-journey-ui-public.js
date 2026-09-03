@@ -95,7 +95,7 @@
 		return Boolean(stop.document) && /recipe/i.test((stop.document_label || '') + ' ' + (stop.title || ''));
 	}
 
-	function getRouteMidpoint(coordinates) {
+	function getRoutePosition(coordinates, progress) {
 		var lengths = [];
 		var totalLength = 0;
 
@@ -111,7 +111,7 @@
 			return coordinates[0];
 		}
 
-		var remaining = totalLength / 2;
+		var remaining = totalLength * Math.max(0, Math.min(1, progress));
 		for (var segment = 0; segment < lengths.length; segment += 1) {
 			if (remaining <= lengths[segment] && lengths[segment] > 0) {
 				var ratio = remaining / lengths[segment];
@@ -124,6 +124,18 @@
 		}
 
 		return coordinates[coordinates.length - 1];
+	}
+
+	function getRouteMidpoint(coordinates) {
+		return getRoutePosition(coordinates, 0.5);
+	}
+
+	function isDirectNarrativeJourney(coordinates) {
+		var uniqueCoordinates = {};
+		coordinates.forEach(function (coordinate) {
+			uniqueCoordinates[Number(coordinate[0]).toFixed(4) + ',' + Number(coordinate[1]).toFixed(4)] = true;
+		});
+		return coordinates.length > 2 && Object.keys(uniqueCoordinates).length === 2;
 	}
 
 	function createRecipeMarkerIcon() {
@@ -152,9 +164,10 @@
 		return icon;
 	}
 
-	function buildDisplayCoordinates(journeys) {
+	function buildMarkerOffsets(journeys) {
 		var occurrences = {};
-		var positions = {};
+		var offsets = {};
+		var used = {};
 
 		journeys.forEach(function (journey) {
 			journey.stops.forEach(function (stop) {
@@ -164,33 +177,34 @@
 		});
 
 		journeys.forEach(function (journey) {
-			positions[journey.id] = journey.stops.map(function (stop) {
+			offsets[journey.id] = journey.stops.map(function (stop) {
 				var key = coordinateKey(stop);
 				var total = occurrences[key];
-				var occurrence = positions[key] || 0;
-				positions[key] = occurrence + 1;
+				var occurrence = used[key] || 0;
+				used[key] = occurrence + 1;
 
 				if (total < 2) {
-					return [stop.longitude, stop.latitude];
+					return [0, 0];
 				}
 
 				var angle = (Math.PI * 2 * occurrence / total) - (Math.PI / 2);
-				var radius = 2.5;
+				var radius = 18;
 				return [
-					Number(stop.longitude) + (Math.cos(angle) * radius),
-					Number(stop.latitude) + (Math.sin(angle) * radius)
+					Math.cos(angle) * radius,
+					Math.sin(angle) * radius
 				];
 			});
 		});
 
-		return positions;
+		return offsets;
 	}
 
-	function addJourney(map, journey, bounds, index, totalJourneys, displayCoordinates, addMarkers) {
+	function addJourney(map, journey, bounds, index, totalJourneys, markerOffsets, addMarkers) {
 		var routeCoordinates = journey.stops.map(function (stop) {
 			return [stop.longitude, stop.latitude];
 		});
-		var markerCoordinates = displayCoordinates[journey.id] || routeCoordinates;
+		var journeyMarkerOffsets = markerOffsets[journey.id] || [];
+		var directNarrativeJourney = isDirectNarrativeJourney(routeCoordinates);
 
 		routeCoordinates.forEach(function (coordinate) {
 			bounds.extend(coordinate);
@@ -233,7 +247,13 @@
 			var marker = document.createElement('button');
 			var recipeStop = isRecipeStop(stop);
 			var stopType = recipeStop ? 'recipe' : (stopIndex === 0 ? 'start' : (stopIndex === journey.stops.length - 1 ? 'end' : 'stop'));
-			var markerCoordinate = recipeStop ? getRouteMidpoint(routeCoordinates) : markerCoordinates[stopIndex];
+			var markerCoordinate = routeCoordinates[stopIndex];
+			if (recipeStop) {
+				markerCoordinate = getRouteMidpoint(routeCoordinates);
+			} else if (directNarrativeJourney && stopIndex > 0 && stopIndex < journey.stops.length - 1) {
+				markerCoordinate = getRoutePosition(routeCoordinates, stopIndex / (journey.stops.length - 1));
+			}
+			var markerOffset = (recipeStop || directNarrativeJourney) ? [0, 0] : (journeyMarkerOffsets[stopIndex] || [0, 0]);
 			marker.type = 'button';
 			marker.className = 'heritaste-map-marker heritaste-map-marker--' + stopType;
 			marker.style.setProperty('--heritaste-marker-color', journey.color);
@@ -245,7 +265,7 @@
 
 			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: window.innerWidth <= 600 ? 'calc(100vw - 32px)' : '480px' })
 				.setDOMContent(createPopupContent(journey, stop));
-			new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom' })
+			new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom', offset: markerOffset })
 				.setLngLat(markerCoordinate)
 				.setPopup(popup)
 				.addTo(map);
@@ -316,9 +336,9 @@
 
 		map.on('load', function () {
 			var bounds = new mapboxgl.LngLatBounds();
-			var displayCoordinates = buildDisplayCoordinates(payload.journeys);
+			var markerOffsets = buildMarkerOffsets(payload.journeys);
 			payload.journeys.forEach(function (journey, index) {
-				addJourney(map, journey, bounds, index, payload.journeys.length, displayCoordinates, true);
+				addJourney(map, journey, bounds, index, payload.journeys.length, markerOffsets, true);
 			});
 
 			window.requestAnimationFrame(function () {
@@ -331,7 +351,7 @@
 					styleSelector.disabled = true;
 					map.once('style.load', function () {
 						payload.journeys.forEach(function (journey, index) {
-							addJourney(map, journey, bounds, index, payload.journeys.length, displayCoordinates, false);
+							addJourney(map, journey, bounds, index, payload.journeys.length, markerOffsets, false);
 						});
 						container.setAttribute('data-active-map-style', nextStyle);
 						styleSelector.disabled = false;
