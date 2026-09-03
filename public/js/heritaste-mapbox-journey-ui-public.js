@@ -88,7 +88,7 @@
 	}
 
 	function coordinateKey(stop) {
-		return Number(stop.longitude).toFixed(4) + ',' + Number(stop.latitude).toFixed(4);
+		return Math.round(Number(stop.longitude) / 10) + ',' + Math.round(Number(stop.latitude) / 10);
 	}
 
 	function isRecipeStop(stop) {
@@ -170,14 +170,20 @@
 		var used = {};
 
 		journeys.forEach(function (journey) {
-			journey.stops.forEach(function (stop) {
+			journey.stops.forEach(function (stop, stopIndex) {
+				if (stopIndex !== 0 && stopIndex !== journey.stops.length - 1) {
+					return;
+				}
 				var key = coordinateKey(stop);
 				occurrences[key] = (occurrences[key] || 0) + 1;
 			});
 		});
 
 		journeys.forEach(function (journey) {
-			offsets[journey.id] = journey.stops.map(function (stop) {
+			offsets[journey.id] = journey.stops.map(function (stop, stopIndex) {
+				if (stopIndex !== 0 && stopIndex !== journey.stops.length - 1) {
+					return [0, 0];
+				}
 				var key = coordinateKey(stop);
 				var total = occurrences[key];
 				var occurrence = used[key] || 0;
@@ -187,8 +193,8 @@
 					return [0, 0];
 				}
 
-				var angle = (Math.PI * 2 * occurrence / total) - (Math.PI / 2);
-				var radius = 18;
+				var angle = Math.PI * 2 * occurrence / total;
+				var radius = 16;
 				return [
 					Math.cos(angle) * radius,
 					Math.sin(angle) * radius
@@ -253,7 +259,8 @@
 			} else if (directNarrativeJourney && stopIndex > 0 && stopIndex < journey.stops.length - 1) {
 				markerCoordinate = getRoutePosition(routeCoordinates, stopIndex / (journey.stops.length - 1));
 			}
-			var markerOffset = (recipeStop || directNarrativeJourney) ? [0, 0] : (journeyMarkerOffsets[stopIndex] || [0, 0]);
+			var directNarrativeMarker = directNarrativeJourney && stopIndex > 0 && stopIndex < journey.stops.length - 1;
+			var markerOffset = (recipeStop || directNarrativeMarker) ? [0, 0] : (journeyMarkerOffsets[stopIndex] || [0, 0]);
 			marker.type = 'button';
 			marker.className = 'heritaste-map-marker heritaste-map-marker--' + stopType;
 			marker.style.setProperty('--heritaste-marker-color', journey.color);
