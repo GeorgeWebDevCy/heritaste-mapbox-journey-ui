@@ -23,11 +23,11 @@
 			content.appendChild(image);
 		}
 
+		content.appendChild(createTextElement('h3', 'heritaste-map-popup__title', stop.title));
 		content.appendChild(createTextElement('p', 'heritaste-map-popup__participant', journey.participant.name));
 		if (journey.participant.age) {
 			content.appendChild(createTextElement('p', 'heritaste-map-popup__meta', 'Age ' + journey.participant.age));
 		}
-		content.appendChild(createTextElement('h3', 'heritaste-map-popup__title', stop.title));
 
 		if (stop.story) {
 			content.appendChild(createTextElement('p', 'heritaste-map-popup__story', stop.story));
