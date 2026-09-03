@@ -190,6 +190,20 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 			)
 		);
 
+		usort(
+			$post_ids,
+			static function ( $left_id, $right_id ) {
+				$left_is_demo  = '1' === get_post_meta( $left_id, '_heritaste_demo_data', true );
+				$right_is_demo = '1' === get_post_meta( $right_id, '_heritaste_demo_data', true );
+
+				if ( $left_is_demo !== $right_is_demo ) {
+					return $left_is_demo ? 1 : -1;
+				}
+
+				return strcasecmp( get_the_title( $left_id ), get_the_title( $right_id ) );
+			}
+		);
+
 		$journeys = array();
 		foreach ( $post_ids as $post_id ) {
 			$journey = $this->prepare_journey( $post_id );

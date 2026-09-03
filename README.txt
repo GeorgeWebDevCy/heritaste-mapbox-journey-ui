@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.6.7
+Stable tag: 1.6.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,9 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.6.8 =
+* List real participants before demo journeys and update the fictional routes to Nepal-Cyprus, Albania-Greece, and Africa-Italy.
 
 = 1.6.7 =
 * Draw routes from true journey coordinates and place recipe content on the route with a plate-and-cutlery marker.
