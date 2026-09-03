@@ -321,7 +321,7 @@ class Heritaste_Mapbox_Journey_Ui_Admin {
 				'journey'     => '[Demo] Asha - Nepal to Cyprus',
 				'origin'      => 'Nepal',
 				'destination' => 'Cyprus',
-				'color'       => '#d68c28',
+				'color'       => '#c45432',
 				'stops'       => array(
 					array( 'stop_title' => 'Kathmandu, Nepal', 'stop_latitude' => 27.7172, 'stop_longitude' => 85.3240, 'stop_story' => 'The demo journey begins in Kathmandu, where family recipes and familiar flavours connect Asha to home.', 'stop_photo' => '', 'stop_audio' => '' ),
 					array( 'stop_title' => 'Doha, Qatar', 'stop_latitude' => 25.2854, 'stop_longitude' => 51.5310, 'stop_story' => 'A short stop in Doha marks the middle of the journey and the anticipation of a new beginning.', 'stop_photo' => '', 'stop_audio' => '' ),
