@@ -10,6 +10,44 @@
 		return element;
 	}
 
+	function createAudioCallToAction(stop) {
+		var wrapper = document.createElement('div');
+		var link = document.createElement('a');
+		var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		var speaker = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+		var soundWave = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+		wrapper.className = 'heritaste-map-popup__audio-cta';
+		link.className = 'heritaste-map-popup__audio-button';
+		link.href = stop.audio || '#';
+		link.setAttribute('aria-label', 'Listen to the full story: ' + stop.title);
+
+		if (!stop.audio) {
+			link.classList.add('heritaste-map-popup__audio-button--placeholder');
+			link.setAttribute('aria-disabled', 'true');
+			link.addEventListener('click', function (event) {
+				event.preventDefault();
+			});
+		}
+
+		icon.setAttribute('viewBox', '0 0 64 64');
+		icon.setAttribute('aria-hidden', 'true');
+		icon.setAttribute('focusable', 'false');
+		speaker.setAttribute('d', 'M14 26h10l13-10v32L24 38H14z');
+		soundWave.setAttribute('d', 'M43 24c4 4 4 12 0 16M49 18c8 8 8 20 0 28');
+		soundWave.setAttribute('fill', 'none');
+		soundWave.setAttribute('stroke', 'currentColor');
+		soundWave.setAttribute('stroke-width', '5');
+		soundWave.setAttribute('stroke-linecap', 'round');
+		icon.appendChild(speaker);
+		icon.appendChild(soundWave);
+		link.appendChild(icon);
+		wrapper.appendChild(link);
+		wrapper.appendChild(createTextElement('span', 'heritaste-map-popup__audio-prompt', 'Click the icon to listen to the full story'));
+
+		return wrapper;
+	}
+
 	function createPopupContent(journey, stop) {
 		var content = document.createElement('article');
 		content.className = 'heritaste-map-popup';
@@ -33,14 +71,8 @@
 			content.appendChild(createTextElement('p', 'heritaste-map-popup__story', stop.story));
 		}
 
-		if (stop.audio) {
-			var audio = document.createElement('audio');
-			audio.controls = true;
-			audio.preload = 'none';
-			audio.src = stop.audio;
-			audio.setAttribute('aria-label', 'Audio for ' + stop.title);
-			content.appendChild(audio);
-		}
+
+		content.appendChild(createAudioCallToAction(stop));
 
 		if (stop.document) {
 			var documentLink = document.createElement('a');

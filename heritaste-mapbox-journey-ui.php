@@ -17,7 +17,7 @@
  * Plugin URI:        https://www.georgenicolaou.me/plugins/heritaste-mapbox-journey-ui
  * Update URI:        https://github.com/GeorgeWebDevCy/heritaste-mapbox-journey-ui
  * Description:       Displays ACF-managed participant journeys together on an interactive Mapbox world map.
- * Version:           1.6.5
+ * Version:           1.6.6
  * Author:            George Nicolaou
  * Author URI:        https://www.georgenicolaou.me/
  * License:           GPL-2.0+
@@ -36,7 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.6.5' );
+define( 'HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.6.6' );
 
 /**
  * Configure updates from the plugin's public GitHub repository.

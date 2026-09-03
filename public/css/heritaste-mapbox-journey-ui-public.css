@@ -354,6 +354,56 @@
 	line-height: 1.55;
 }
 
+.heritaste-map-popup__audio-cta {
+	display: flex;
+	align-items: center;
+	gap: 0.7rem;
+	margin: 0.85rem 0 0.35rem;
+}
+
+.heritaste-map-popup__audio-button {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 3.25rem;
+	height: 3.25rem;
+	border: 3px solid var(--heritaste-map-ink);
+	border-radius: 50%;
+	background: var(--heritaste-map-surface);
+	color: var(--heritaste-map-ink);
+	text-decoration: none;
+	transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.heritaste-map-popup__audio-button:hover,
+.heritaste-map-popup__audio-button:focus-visible {
+	background: var(--heritaste-map-ink);
+	color: var(--heritaste-map-surface);
+}
+
+.heritaste-map-popup__audio-button:active {
+	transform: translateY(1px);
+}
+
+.heritaste-map-popup__audio-button svg {
+	display: block;
+	width: 2.35rem;
+	height: 2.35rem;
+	fill: currentColor;
+}
+
+.heritaste-map-popup__audio-button--placeholder {
+	cursor: default;
+}
+
+.heritaste-map-popup__audio-prompt {
+	max-width: 15rem;
+	font-size: 0.82rem;
+	font-weight: 700;
+	line-height: 1.35;
+}
+
 .heritaste-map-popup audio,
 .heritaste-journey-summary audio {
 	display: block;
