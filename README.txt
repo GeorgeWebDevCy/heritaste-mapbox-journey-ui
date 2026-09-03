@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.6.12
+Stable tag: 1.6.13
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,9 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.6.13 =
+* Use proximity grouping so endpoint pins on opposite sides of a coordinate bucket are also separated.
 
 = 1.6.12 =
 * Separate nearby origin and destination pins with compact pixel offsets while keeping them in the correct country area.

@@ -9,7 +9,7 @@ $public      = file_get_contents( $root . '/public/class-heritaste-mapbox-journe
 $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-ui-public.js' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.6.12" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.6.13" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -38,6 +38,7 @@ $expectations = array(
 	'Overlapping-point separation' => array( $javascript, 'buildMarkerOffsets' ),
 	'Pixel-based marker offset'    => array( $javascript, 'offset: markerOffset' ),
 	'Endpoint-only collision scan' => array( $javascript, 'stopIndex !== 0 && stopIndex !== journey.stops.length - 1' ),
+	'Endpoint proximity grouping'  => array( $javascript, 'Math.abs(candidate.longitude - longitude) <= 5' ),
 	'Direct narrative route'       => array( $javascript, 'isDirectNarrativeJourney(routeCoordinates)' ),
 	'Narrative markers on line'    => array( $javascript, 'getRoutePosition(routeCoordinates, stopIndex / (journey.stops.length - 1))' ),
 	'Location pin marker anchor'   => array( $javascript, "anchor: recipeStop ? 'center' : 'bottom'" ),

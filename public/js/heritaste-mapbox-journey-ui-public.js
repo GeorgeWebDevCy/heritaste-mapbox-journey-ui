@@ -87,10 +87,6 @@
 		return content;
 	}
 
-	function coordinateKey(stop) {
-		return Math.round(Number(stop.longitude) / 10) + ',' + Math.round(Number(stop.latitude) / 10);
-	}
-
 	function isRecipeStop(stop) {
 		return Boolean(stop.document) && /recipe/i.test((stop.document_label || '') + ' ' + (stop.title || ''));
 	}
@@ -165,37 +161,43 @@
 	}
 
 	function buildMarkerOffsets(journeys) {
-		var occurrences = {};
+		var endpointGroups = [];
 		var offsets = {};
-		var used = {};
 
 		journeys.forEach(function (journey) {
+			offsets[journey.id] = journey.stops.map(function () {
+				return [0, 0];
+			});
+
 			journey.stops.forEach(function (stop, stopIndex) {
 				if (stopIndex !== 0 && stopIndex !== journey.stops.length - 1) {
 					return;
 				}
-				var key = coordinateKey(stop);
-				occurrences[key] = (occurrences[key] || 0) + 1;
+
+				var longitude = Number(stop.longitude);
+				var latitude = Number(stop.latitude);
+				var group = endpointGroups.find(function (candidate) {
+					return Math.abs(candidate.longitude - longitude) <= 5 && Math.abs(candidate.latitude - latitude) <= 5;
+				});
+
+				if (!group) {
+					group = { longitude: longitude, latitude: latitude, endpoints: [] };
+					endpointGroups.push(group);
+				}
+
+				group.endpoints.push({ journeyId: journey.id, stopIndex: stopIndex });
 			});
 		});
 
-		journeys.forEach(function (journey) {
-			offsets[journey.id] = journey.stops.map(function (stop, stopIndex) {
-				if (stopIndex !== 0 && stopIndex !== journey.stops.length - 1) {
-					return [0, 0];
-				}
-				var key = coordinateKey(stop);
-				var total = occurrences[key];
-				var occurrence = used[key] || 0;
-				used[key] = occurrence + 1;
+		endpointGroups.forEach(function (group) {
+			if (group.endpoints.length < 2) {
+				return;
+			}
 
-				if (total < 2) {
-					return [0, 0];
-				}
-
-				var angle = Math.PI * 2 * occurrence / total;
+			group.endpoints.forEach(function (endpoint, occurrence) {
+				var angle = Math.PI * 2 * occurrence / group.endpoints.length;
 				var radius = 16;
-				return [
+				offsets[endpoint.journeyId][endpoint.stopIndex] = [
 					Math.cos(angle) * radius,
 					Math.sin(angle) * radius
 				];
