@@ -10,7 +10,86 @@
 		return element;
 	}
 
-	function createAudioCallToAction(stop) {
+	// Returns the 11-character video ID for YouTube watch, Shorts, embed and
+	// youtu.be links, or an empty string for anything else.
+	function getYouTubeId(url) {
+		var id = '';
+		try {
+			var parsed = new URL(url, window.location.href);
+			var host = parsed.hostname.replace(/^(www|m)\./, '');
+			if (host === 'youtu.be') {
+				id = parsed.pathname.split('/')[1] || '';
+			} else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+				var pathMatch = parsed.pathname.match(/^\/(?:shorts|embed|live)\/([^/?#]+)/);
+				id = parsed.searchParams.get('v') || (pathMatch ? pathMatch[1] : '');
+			}
+		} catch (error) {
+			return '';
+		}
+		return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : '';
+	}
+
+	var videoDialog = null;
+
+	// One shared modal for story videos. The YouTube player loads only when a
+	// visitor opens it, and is removed on close so playback stops.
+	function getVideoDialog() {
+		if (videoDialog) {
+			return videoDialog;
+		}
+
+		var dialog = document.createElement('dialog');
+		var frame = document.createElement('div');
+		var closeButton = document.createElement('button');
+
+		dialog.className = 'heritaste-video-dialog';
+		frame.className = 'heritaste-video-dialog__frame';
+		closeButton.type = 'button';
+		closeButton.className = 'heritaste-video-dialog__close';
+		closeButton.setAttribute('aria-label', 'Close video');
+		closeButton.textContent = '×';
+		closeButton.addEventListener('click', function () {
+			dialog.close();
+		});
+
+		dialog.addEventListener('click', function (event) {
+			if (event.target === dialog) {
+				dialog.close();
+			}
+		});
+		dialog.addEventListener('close', function () {
+			frame.textContent = '';
+		});
+
+		dialog.appendChild(closeButton);
+		dialog.appendChild(frame);
+		document.body.appendChild(dialog);
+		videoDialog = { dialog: dialog, frame: frame };
+
+		return videoDialog;
+	}
+
+	function openVideoDialog(videoId, title) {
+		var video = getVideoDialog();
+		var iframe = document.createElement('iframe');
+
+		iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(videoId) + '?autoplay=1&rel=0&playsinline=1';
+		iframe.title = title;
+		iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+		iframe.allowFullscreen = true;
+		iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+		video.frame.textContent = '';
+		video.frame.appendChild(iframe);
+		video.dialog.setAttribute('aria-label', title);
+
+		if (typeof video.dialog.showModal === 'function') {
+			video.dialog.showModal();
+		} else {
+			window.open('https://www.youtube.com/watch?v=' + encodeURIComponent(videoId), '_blank', 'noopener');
+		}
+	}
+
+	function createAudioCallToAction(stop, journey) {
 		var wrapper = document.createElement('div');
 		var link = document.createElement('a');
 		var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -22,12 +101,23 @@
 		link.href = stop.audio || '#';
 		link.setAttribute('aria-label', 'Listen to the full story: ' + stop.title);
 
+		var videoId = stop.audio ? getYouTubeId(stop.audio) : '';
+
 		if (!stop.audio) {
 			link.classList.add('heritaste-map-popup__audio-button--placeholder');
 			link.setAttribute('aria-disabled', 'true');
 			link.addEventListener('click', function (event) {
 				event.preventDefault();
 			});
+		} else if (videoId) {
+			link.setAttribute('aria-haspopup', 'dialog');
+			link.addEventListener('click', function (event) {
+				event.preventDefault();
+				openVideoDialog(videoId, journey.participant.name + ' — ' + stop.title);
+			});
+		} else {
+			link.target = '_blank';
+			link.rel = 'noopener noreferrer';
 		}
 
 		icon.setAttribute('viewBox', '0 0 64 64');
@@ -72,7 +162,7 @@
 		}
 
 
-		content.appendChild(createAudioCallToAction(stop));
+		content.appendChild(createAudioCallToAction(stop, journey));
 
 		if (stop.document) {
 			var documentLink = document.createElement('a');

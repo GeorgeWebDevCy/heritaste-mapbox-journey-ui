@@ -618,3 +618,63 @@
 		transition: none;
 	}
 }
+
+/* Story video dialog (portrait 3:4 videos with waveform and subtitles). */
+.heritaste-video-dialog {
+	width: min(92vw, calc(84vh * 3 / 4), 560px);
+	max-width: none;
+	max-height: none;
+	padding: 0;
+	overflow: visible;
+	border: 0;
+	border-radius: 12px;
+	background: #000;
+	box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+.heritaste-video-dialog::backdrop {
+	background: rgba(20, 16, 12, 0.78);
+}
+
+.heritaste-video-dialog__frame {
+	aspect-ratio: 3 / 4;
+	overflow: hidden;
+	border-radius: 12px;
+}
+
+.heritaste-video-dialog__frame iframe {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+
+.heritaste-video-dialog__close {
+	position: absolute;
+	top: -14px;
+	right: -14px;
+	z-index: 1;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 2px solid #fffaf2;
+	border-radius: 50%;
+	background: #2a241e;
+	color: #fffaf2;
+	font-size: 1.6rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.heritaste-video-dialog__close:hover,
+.heritaste-video-dialog__close:focus-visible {
+	outline: 3px solid #fffaf2;
+	outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+	.heritaste-video-dialog__close {
+		top: -54px;
+		right: 0;
+	}
+}

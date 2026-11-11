@@ -146,7 +146,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 								<li>
 									<strong><?php echo esc_html( $stop['title'] ); ?></strong>
 									<?php if ( '' !== $stop['story'] ) : ?><p><?php echo esc_html( $stop['story'] ); ?></p><?php endif; ?>
-									<?php if ( '' !== $stop['audio'] ) : ?><audio controls preload="none" src="<?php echo esc_url( $stop['audio'] ); ?>"></audio><?php endif; ?>
+									<?php if ( '' !== $stop['audio'] && $this->is_video_link( $stop['audio'] ) ) : ?><p><a href="<?php echo esc_url( $stop['audio'] ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Watch the full story', 'heritaste-mapbox-journey-ui' ); ?></a></p><?php elseif ( '' !== $stop['audio'] ) : ?><audio controls preload="none" src="<?php echo esc_url( $stop['audio'] ); ?>"></audio><?php endif; ?>
 									<?php if ( '' !== $stop['document'] ) : ?><p><a href="<?php echo esc_url( $stop['document'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $stop['document_label'] ); ?></a></p><?php endif; ?>
 								</li>
 							<?php endforeach; ?>
@@ -305,6 +305,11 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 			),
 			'stops'               => $stops,
 		);
+	}
+
+	private function is_video_link( $url ) {
+		$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+		return in_array( preg_replace( '/^(www|m)\./', '', $host ), array( 'youtube.com', 'youtu.be', 'youtube-nocookie.com' ), true );
 	}
 
 	private function get_media_url( $value ) {

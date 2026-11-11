@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,7 @@ Mapbox-powered journey and heritage-map interface for Heritaste.eu.
 
 == Description ==
 
-Heritaste Mapbox Journey UI displays every published participant journey together on one interactive Mapbox world map. Journey routes and stops are managed with ACF Pro. Stops can include a photo, story text, audio recording, and a labelled supporting document. Participant age can also appear in map popups.
+Heritaste Mapbox Journey UI displays every published participant journey together on one interactive Mapbox world map. Journey routes and stops are managed with ACF Pro. Stops can include a photo, story text, an audio file or YouTube video link (YouTube videos play in an on-page dialog via youtube-nocookie.com), and a labelled supporting document. Participant age can also appear in map popups.
 
 Configure a Mapbox public access token under **Settings → Heritaste Journey Map**, then place `[heritaste_journey_map]` on the map page.
 Use `[heritaste_journey_map layout="fullscreen"]` for a full-width, full-viewport-height map page.
@@ -24,6 +24,10 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.8.0 =
+* Play YouTube story videos in a dialog over the map instead of leaving the page. The player loads only on click, uses YouTube's privacy-enhanced (no-cookie) domain, and stops when closed.
+* Show a "Watch the full story" link for YouTube stops in the text fallback list.
 
 = 1.7.0 =
 * Draw every journey from the same origin country in one shared route colour (configurable under Settings, Nepal by default).

@@ -10,7 +10,7 @@ $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-u
 $css         = file_get_contents( $root . '/public/css/heritaste-mapbox-journey-ui-public.css' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.7.0" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.8.0" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -22,7 +22,7 @@ $expectations = array(
 	'Participant age payload'      => array( $public, "get_field( 'participant_age'" ),
 	'Supporting document payload'  => array( $public, "'document'  =>" ),
 	'Supporting document link'     => array( $javascript, "documentLink.rel = 'noopener noreferrer'" ),
-	'Audio speaker CTA'            => array( $javascript, 'createAudioCallToAction(stop)' ),
+	'Audio speaker CTA'            => array( $javascript, 'createAudioCallToAction(stop, journey)' ),
 	'Audio prompt text'            => array( $javascript, 'Click the icon to listen to the full story' ),
 	'Fullscreen shortcode layout'  => array( $public, "'fullscreen' === sanitize_key" ),
 	'Participant journey legend'   => array( $public, 'heritaste-map-legend' ),
@@ -45,6 +45,10 @@ $expectations = array(
 	'Shared colour applied'        => array( $public, '$shared_color ?:' ),
 	'Shared-colour route overlay'  => array( $javascript, 'buildRouteOffsets(payload.journeys)' ),
 	'Origin pin name on hover'     => array( $javascript, "'heritaste-map-marker__name', journey.participant.name" ),
+	'YouTube story video dialog'   => array( $javascript, 'openVideoDialog(videoId' ),
+	'Privacy-enhanced embed'       => array( $javascript, 'https://www.youtube-nocookie.com/embed/' ),
+	'Video stops on close'         => array( $javascript, "dialog.addEventListener('close'" ),
+	'Video fallback link'          => array( $public, "is_video_link( \$stop['audio'] )" ),
 	'Origin name hover style'      => array( $css, '.heritaste-map-marker--start:hover .heritaste-map-marker__name' ),
 	'Direct narrative route'       => array( $javascript, 'isDirectNarrativeJourney(routeCoordinates)' ),
 	'Narrative markers on line'    => array( $javascript, 'getRoutePosition(routeCoordinates, stopIndex / (journey.stops.length - 1))' ),
