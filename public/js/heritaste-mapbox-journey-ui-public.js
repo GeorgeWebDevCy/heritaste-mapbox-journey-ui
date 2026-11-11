@@ -160,44 +160,85 @@
 		return icon;
 	}
 
+	function getRouteCoordinates(journey) {
+		return journey.stops.map(function (stop) {
+			return [stop.longitude, stop.latitude];
+		});
+	}
+
+	// Where each stop's marker is drawn. Recipe and narrative stops sit on the
+	// route line; endpoints stay on their true coordinates.
+	function getMarkerPlacements(journey) {
+		var routeCoordinates = getRouteCoordinates(journey);
+		var directNarrativeJourney = isDirectNarrativeJourney(routeCoordinates);
+
+		return journey.stops.map(function (stop, stopIndex) {
+			var recipeStop = isRecipeStop(stop);
+			var isEndpoint = stopIndex === 0 || stopIndex === journey.stops.length - 1;
+			var directNarrativeMarker = directNarrativeJourney && !isEndpoint;
+			var coordinate = routeCoordinates[stopIndex];
+
+			if (recipeStop) {
+				coordinate = getRouteMidpoint(routeCoordinates);
+			} else if (directNarrativeMarker) {
+				coordinate = getRoutePosition(routeCoordinates, stopIndex / (journey.stops.length - 1));
+			}
+
+			return {
+				coordinate: coordinate,
+				recipe: recipeStop,
+				onRoute: recipeStop || directNarrativeMarker
+			};
+		});
+	}
+
 	function buildMarkerOffsets(journeys) {
-		var endpointGroups = [];
+		var markerGroups = [];
 		var offsets = {};
 
 		journeys.forEach(function (journey) {
+			var placements = getMarkerPlacements(journey);
 			offsets[journey.id] = journey.stops.map(function () {
 				return [0, 0];
 			});
 
-			journey.stops.forEach(function (stop, stopIndex) {
-				if (stopIndex !== 0 && stopIndex !== journey.stops.length - 1) {
+			placements.forEach(function (placement, stopIndex) {
+				var isEndpoint = stopIndex === 0 || stopIndex === journey.stops.length - 1;
+				if (!isEndpoint && !placement.onRoute) {
 					return;
 				}
 
-				var longitude = Number(stop.longitude);
-				var latitude = Number(stop.latitude);
-				var group = endpointGroups.find(function (candidate) {
-					return Math.abs(candidate.longitude - longitude) <= 5 && Math.abs(candidate.latitude - latitude) <= 5;
+				// Endpoints group by proximity within a country area; on-route
+				// markers only group when journeys share almost the same line.
+				var pool = placement.onRoute ? 'route' : 'endpoint';
+				var tolerance = placement.onRoute ? 0.5 : 5;
+				var longitude = Number(placement.coordinate[0]);
+				var latitude = Number(placement.coordinate[1]);
+				var group = markerGroups.find(function (candidate) {
+					return candidate.pool === pool && Math.abs(candidate.longitude - longitude) <= tolerance && Math.abs(candidate.latitude - latitude) <= tolerance;
 				});
 
 				if (!group) {
-					group = { longitude: longitude, latitude: latitude, endpoints: [] };
-					endpointGroups.push(group);
+					group = { pool: pool, longitude: longitude, latitude: latitude, markers: [] };
+					markerGroups.push(group);
 				}
 
-				group.endpoints.push({ journeyId: journey.id, stopIndex: stopIndex });
+				group.markers.push({ journeyId: journey.id, stopIndex: stopIndex });
 			});
 		});
 
-		endpointGroups.forEach(function (group) {
-			if (group.endpoints.length < 2) {
+		markerGroups.forEach(function (group) {
+			if (group.markers.length < 2) {
 				return;
 			}
 
-			group.endpoints.forEach(function (endpoint, occurrence) {
-				var angle = Math.PI * 2 * occurrence / group.endpoints.length;
-				var radius = 16;
-				offsets[endpoint.journeyId][endpoint.stopIndex] = [
+			// Grow the ring with the group size so neighbouring pins stay
+			// separately hoverable and clickable.
+			var halfSpacing = group.pool === 'route' ? 19 : 15;
+			var radius = Math.max(group.pool === 'route' ? 20 : 16, halfSpacing / Math.sin(Math.PI / group.markers.length));
+			group.markers.forEach(function (entry, occurrence) {
+				var angle = Math.PI * 2 * occurrence / group.markers.length;
+				offsets[entry.journeyId][entry.stopIndex] = [
 					Math.cos(angle) * radius,
 					Math.sin(angle) * radius
 				];
@@ -207,12 +248,28 @@
 		return offsets;
 	}
 
-	function addJourney(map, journey, bounds, index, totalJourneys, markerOffsets, addMarkers) {
-		var routeCoordinates = journey.stops.map(function (stop) {
-			return [stop.longitude, stop.latitude];
+	// Journeys sharing a colour (e.g. one origin country) share one line offset
+	// so their identical routes draw as a single line.
+	function buildRouteOffsets(journeys) {
+		var colors = [];
+		journeys.forEach(function (journey) {
+			if (colors.indexOf(journey.color) === -1) {
+				colors.push(journey.color);
+			}
 		});
+
+		var offsets = {};
+		journeys.forEach(function (journey) {
+			offsets[journey.id] = (colors.indexOf(journey.color) - ((colors.length - 1) / 2)) * 2;
+		});
+
+		return offsets;
+	}
+
+	function addJourney(map, journey, bounds, index, routeOffset, markerOffsets, addMarkers) {
+		var routeCoordinates = getRouteCoordinates(journey);
 		var journeyMarkerOffsets = markerOffsets[journey.id] || [];
-		var directNarrativeJourney = isDirectNarrativeJourney(routeCoordinates);
+		var placements = getMarkerPlacements(journey);
 
 		routeCoordinates.forEach(function (coordinate) {
 			bounds.extend(coordinate);
@@ -241,7 +298,7 @@
 						'line-color': journey.color,
 						'line-width': 3,
 						'line-opacity': 0.88,
-						'line-offset': (index - ((totalJourneys - 1) / 2)) * 2
+						'line-offset': routeOffset
 					}
 				});
 			}
@@ -253,21 +310,21 @@
 
 		journey.stops.forEach(function (stop, stopIndex) {
 			var marker = document.createElement('button');
-			var recipeStop = isRecipeStop(stop);
+			var placement = placements[stopIndex];
+			var recipeStop = placement.recipe;
 			var stopType = recipeStop ? 'recipe' : (stopIndex === 0 ? 'start' : (stopIndex === journey.stops.length - 1 ? 'end' : 'stop'));
-			var markerCoordinate = routeCoordinates[stopIndex];
-			if (recipeStop) {
-				markerCoordinate = getRouteMidpoint(routeCoordinates);
-			} else if (directNarrativeJourney && stopIndex > 0 && stopIndex < journey.stops.length - 1) {
-				markerCoordinate = getRoutePosition(routeCoordinates, stopIndex / (journey.stops.length - 1));
-			}
-			var directNarrativeMarker = directNarrativeJourney && stopIndex > 0 && stopIndex < journey.stops.length - 1;
-			var markerOffset = (recipeStop || directNarrativeMarker) ? [0, 0] : (journeyMarkerOffsets[stopIndex] || [0, 0]);
+			var markerCoordinate = placement.coordinate;
+			var markerOffset = journeyMarkerOffsets[stopIndex] || [0, 0];
 			marker.type = 'button';
 			marker.className = 'heritaste-map-marker heritaste-map-marker--' + stopType;
 			marker.style.setProperty('--heritaste-marker-color', journey.color);
 			marker.setAttribute('aria-label', journey.participant.name + ' — ' + (stopType === 'start' ? 'Origin' : (stopType === 'end' ? 'Destination' : (stopType === 'recipe' ? 'Recipe' : 'Stop'))) + ': ' + stop.title);
-			marker.setAttribute('title', stop.title);
+			if (stopType === 'start') {
+				// Shown by CSS on hover/focus; the popup still opens only on click.
+				marker.appendChild(createTextElement('span', 'heritaste-map-marker__name', journey.participant.name));
+			} else {
+				marker.setAttribute('title', stop.title);
+			}
 			if (recipeStop) {
 				marker.appendChild(createRecipeMarkerIcon());
 			}
@@ -346,8 +403,9 @@
 		map.on('load', function () {
 			var bounds = new mapboxgl.LngLatBounds();
 			var markerOffsets = buildMarkerOffsets(payload.journeys);
+			var routeOffsets = buildRouteOffsets(payload.journeys);
 			payload.journeys.forEach(function (journey, index) {
-				addJourney(map, journey, bounds, index, payload.journeys.length, markerOffsets, true);
+				addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerOffsets, true);
 			});
 
 			window.requestAnimationFrame(function () {
@@ -360,7 +418,7 @@
 					styleSelector.disabled = true;
 					map.once('style.load', function () {
 						payload.journeys.forEach(function (journey, index) {
-							addJourney(map, journey, bounds, index, payload.journeys.length, markerOffsets, false);
+							addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerOffsets, false);
 						});
 						container.setAttribute('data-active-map-style', nextStyle);
 						styleSelector.disabled = false;

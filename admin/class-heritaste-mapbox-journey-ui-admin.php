@@ -117,6 +117,16 @@ class Heritaste_Mapbox_Journey_Ui_Admin {
 			)
 		);
 
+		register_setting(
+			'heritaste_mapbox_journey_ui',
+			'heritaste_origin_route_colors',
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( $this, 'sanitize_origin_route_colors' ),
+				'default'           => Heritaste_Mapbox_Journey_Ui_Public::DEFAULT_ORIGIN_ROUTE_COLORS,
+			)
+		);
+
 		add_settings_section(
 			'heritaste_mapbox_connection',
 			__( 'Mapbox connection', 'heritaste-mapbox-journey-ui' ),
@@ -139,6 +149,42 @@ class Heritaste_Mapbox_Journey_Ui_Admin {
 			$this->plugin_name,
 			'heritaste_mapbox_connection'
 		);
+
+		add_settings_section(
+			'heritaste_route_display',
+			__( 'Route display', 'heritaste-mapbox-journey-ui' ),
+			'__return_false',
+			$this->plugin_name
+		);
+
+		add_settings_field(
+			'heritaste_origin_route_colors',
+			__( 'Shared route colours by origin country', 'heritaste-mapbox-journey-ui' ),
+			array( $this, 'render_origin_route_colors_field' ),
+			$this->plugin_name,
+			'heritaste_route_display'
+		);
+	}
+
+	/**
+	 * Keep only valid "Country = #hex" lines, one per country.
+	 */
+	public function sanitize_origin_route_colors( $value ) {
+		$lines = array();
+		foreach ( Heritaste_Mapbox_Journey_Ui_Public::parse_origin_route_colors( $value ) as $entry ) {
+			$lines[] = $entry['country'] . ' = ' . $entry['color'];
+		}
+
+		return implode( "\n", $lines );
+	}
+
+	public function render_origin_route_colors_field() {
+		$value = (string) get_option( 'heritaste_origin_route_colors', Heritaste_Mapbox_Journey_Ui_Public::DEFAULT_ORIGIN_ROUTE_COLORS );
+		printf(
+			'<textarea class="large-text code" rows="4" id="heritaste_origin_route_colors" name="heritaste_origin_route_colors" aria-describedby="heritaste-origin-route-colors-help">%s</textarea>',
+			esc_textarea( $value )
+		);
+		echo '<p class="description" id="heritaste-origin-route-colors-help">' . esc_html__( 'One line per country, for example "Nepal = #c8102e". Every journey whose origin country matches uses this route colour instead of its own.', 'heritaste-mapbox-journey-ui' ) . '</p>';
 	}
 
 	/**

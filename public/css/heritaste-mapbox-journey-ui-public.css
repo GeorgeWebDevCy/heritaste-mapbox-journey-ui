@@ -159,6 +159,47 @@
 	transform: rotate(-45deg) scale(1.12);
 }
 
+/* Participant name shown above an origin pin on hover or keyboard focus. */
+.heritaste-map-marker__name {
+	position: absolute;
+	bottom: calc(100% + 0.55rem);
+	left: 50%;
+	z-index: 2;
+	padding: 0.3rem 0.6rem;
+	border-left: 4px solid var(--heritaste-marker-color, #c45432);
+	border-radius: 4px;
+	background: var(--heritaste-map-surface);
+	box-shadow: 0 3px 10px rgba(42, 36, 30, 0.28);
+	color: var(--heritaste-map-ink);
+	font-size: 0.82rem;
+	font-weight: 700;
+	line-height: 1.2;
+	white-space: nowrap;
+	pointer-events: none;
+	opacity: 0;
+	visibility: hidden;
+	transform: translate(-50%, 4px);
+	transition: opacity 140ms ease, transform 140ms ease, visibility 140ms;
+}
+
+.heritaste-map-marker--start:hover .heritaste-map-marker__name,
+.heritaste-map-marker--start:focus-visible .heritaste-map-marker__name {
+	opacity: 1;
+	visibility: visible;
+	transform: translate(-50%, 0);
+}
+
+.heritaste-map-marker--start:hover,
+.heritaste-map-marker--start:focus-visible {
+	z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.heritaste-map-marker__name {
+		transition: none;
+	}
+}
+
 .heritaste-map-legend {
 	position: absolute;
 	z-index: 5;

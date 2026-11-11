@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.6.13
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,11 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.7.0 =
+* Draw every journey from the same origin country in one shared route colour (configurable under Settings, Nepal by default).
+* Show the participant name when hovering over or focusing an origin pin.
+* Spread overlapping recipe and story pins when several journeys share the same route.
 
 = 1.6.13 =
 * Use proximity grouping so endpoint pins on opposite sides of a coordinate bucket are also separated.

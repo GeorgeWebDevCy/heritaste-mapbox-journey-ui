@@ -7,6 +7,8 @@
  */
 class Heritaste_Mapbox_Journey_Ui_Public {
 
+	const DEFAULT_ORIGIN_ROUTE_COLORS = 'Nepal = #c8102e';
+
 	private $plugin_name;
 	private $version;
 	private $assets_configured = false;
@@ -176,6 +178,41 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 		}
 	}
 
+	/**
+	 * Parse "Country = #hex" lines into a lowercase country => colour map.
+	 *
+	 * Journeys whose origin country appears here share one route colour, so
+	 * every participant from that country reads as one group on the map.
+	 */
+	public static function parse_origin_route_colors( $value ) {
+		$colors = array();
+		foreach ( preg_split( '/\r\n|\r|\n/', (string) $value ) as $line ) {
+			if ( ! preg_match( '/^\s*([^=:]+?)\s*[=:]\s*(#[0-9a-f]{3}(?:[0-9a-f]{3})?)\s*$/i', $line, $matches ) ) {
+				continue;
+			}
+			$country = sanitize_text_field( $matches[1] );
+			$color   = sanitize_hex_color( $matches[2] );
+			if ( '' !== $country && $color ) {
+				$colors[ strtolower( $country ) ] = array(
+					'country' => $country,
+					'color'   => strtolower( $color ),
+				);
+			}
+		}
+
+		return $colors;
+	}
+
+	private function get_origin_route_color( $origin_country ) {
+		static $colors = null;
+		if ( null === $colors ) {
+			$colors = self::parse_origin_route_colors( get_option( 'heritaste_origin_route_colors', self::DEFAULT_ORIGIN_ROUTE_COLORS ) );
+		}
+		$key = strtolower( trim( (string) $origin_country ) );
+
+		return isset( $colors[ $key ] ) ? $colors[ $key ]['color'] : '';
+	}
+
 	private function get_journeys() {
 		$post_ids = get_posts(
 			array(
@@ -250,12 +287,15 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 			return null;
 		}
 
+		$origin_country = sanitize_text_field( get_field( 'origin_country', $post_id ) );
+		$shared_color   = $this->get_origin_route_color( $origin_country );
+
 		return array(
 			'id'                  => absint( $post_id ),
 			'title'               => get_the_title( $post_id ),
-			'origin_country'      => sanitize_text_field( get_field( 'origin_country', $post_id ) ),
+			'origin_country'      => $origin_country,
 			'destination_country' => sanitize_text_field( get_field( 'destination_country', $post_id ) ),
-			'color'               => sanitize_hex_color( get_field( 'journey_color', $post_id ) ) ?: '#c45432',
+			'color'               => $shared_color ?: ( sanitize_hex_color( get_field( 'journey_color', $post_id ) ) ?: '#c45432' ),
 			'participant'         => array(
 				'id'        => $participant_id,
 				'name'      => $participant_id ? get_the_title( $participant_id ) : get_the_title( $post_id ),

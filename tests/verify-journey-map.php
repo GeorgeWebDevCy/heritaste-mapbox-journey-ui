@@ -7,9 +7,10 @@ $admin       = file_get_contents( $root . '/admin/class-heritaste-mapbox-journey
 $admin_view  = file_get_contents( $root . '/admin/partials/heritaste-mapbox-journey-ui-admin-display.php' );
 $public      = file_get_contents( $root . '/public/class-heritaste-mapbox-journey-ui-public.php' );
 $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-ui-public.js' );
+$css         = file_get_contents( $root . '/public/css/heritaste-mapbox-journey-ui-public.css' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.6.13" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.7.0" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -37,8 +38,14 @@ $expectations = array(
 	'Keyboard-labelled marker'     => array( $javascript, "marker.setAttribute('aria-label'" ),
 	'Overlapping-point separation' => array( $javascript, 'buildMarkerOffsets' ),
 	'Pixel-based marker offset'    => array( $javascript, 'offset: markerOffset' ),
-	'Endpoint-only collision scan' => array( $javascript, 'stopIndex !== 0 && stopIndex !== journey.stops.length - 1' ),
-	'Endpoint proximity grouping'  => array( $javascript, 'Math.abs(candidate.longitude - longitude) <= 5' ),
+	'Endpoint and route pools'     => array( $javascript, "var pool = placement.onRoute ? 'route' : 'endpoint'" ),
+	'Marker proximity grouping'    => array( $javascript, 'Math.abs(candidate.longitude - longitude) <= tolerance' ),
+	'Shared origin colour setting' => array( $admin, "'heritaste_origin_route_colors'" ),
+	'Nepal default shared colour'  => array( $public, "DEFAULT_ORIGIN_ROUTE_COLORS = 'Nepal = #c8102e'" ),
+	'Shared colour applied'        => array( $public, '$shared_color ?:' ),
+	'Shared-colour route overlay'  => array( $javascript, 'buildRouteOffsets(payload.journeys)' ),
+	'Origin pin name on hover'     => array( $javascript, "'heritaste-map-marker__name', journey.participant.name" ),
+	'Origin name hover style'      => array( $css, '.heritaste-map-marker--start:hover .heritaste-map-marker__name' ),
 	'Direct narrative route'       => array( $javascript, 'isDirectNarrativeJourney(routeCoordinates)' ),
 	'Narrative markers on line'    => array( $javascript, 'getRoutePosition(routeCoordinates, stopIndex / (journey.stops.length - 1))' ),
 	'Location pin marker anchor'   => array( $javascript, "anchor: recipeStop ? 'center' : 'bottom'" ),
