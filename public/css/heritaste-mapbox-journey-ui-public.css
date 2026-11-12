@@ -104,14 +104,15 @@
 	background: var(--heritaste-marker-color, #c45432);
 }
 
+/* Story pins on the route line are smaller so the line stays visible. */
 .heritaste-map-marker--stop {
-	width: 1.72rem;
-	height: 1.72rem;
+	width: 1.4rem;
+	height: 1.4rem;
 }
 
 .heritaste-map-marker--recipe {
-	width: 2.7rem;
-	height: 2.7rem;
+	width: 2.2rem;
+	height: 2.2rem;
 	border: 2px solid var(--heritaste-map-surface);
 	border-radius: 50%;
 	background: var(--heritaste-marker-color, #c45432);

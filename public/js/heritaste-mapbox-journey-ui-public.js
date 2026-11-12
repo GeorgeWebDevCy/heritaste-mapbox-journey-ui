@@ -341,10 +341,10 @@
 	// Journeys sharing a colour (e.g. one origin country) share one line offset
 	// so their identical routes draw as a single line.
 	// Journeys that follow the same route (e.g. everyone from Nepal to Cyprus)
-	// are drawn as parallel lines a few pixels apart, so each participant keeps
+	// are drawn as parallel lines 6px apart, so each participant keeps
 	// a visible line of their own while sharing their origin country's colour.
 	function buildRouteOffsets(journeys) {
-		var spacing = 5;
+		var spacing = 6;
 		var groups = {};
 
 		journeys.forEach(function (journey) {
@@ -387,6 +387,23 @@
 				});
 			}
 
+			// A light casing under each route keeps it readable over satellite
+			// imagery and dark map styles.
+			if (!map.getLayer(sourceId + '-casing')) {
+				map.addLayer({
+					id: sourceId + '-casing',
+					type: 'line',
+					source: sourceId,
+					layout: { 'line-cap': 'round', 'line-join': 'round' },
+					paint: {
+						'line-color': '#fffaf2',
+						'line-width': 6.5,
+						'line-opacity': 0.9,
+						'line-offset': routeOffset
+					}
+				});
+			}
+
 			if (!map.getLayer(sourceId)) {
 				map.addLayer({
 					id: sourceId,
@@ -395,8 +412,8 @@
 					layout: { 'line-cap': 'round', 'line-join': 'round' },
 					paint: {
 						'line-color': journey.color,
-						'line-width': 3,
-						'line-opacity': 0.88,
+						'line-width': 3.5,
+						'line-opacity': 0.95,
 						'line-offset': routeOffset
 					}
 				});
@@ -451,11 +468,14 @@
 			};
 		}
 
+		// The legend sits in the bottom-left corner, so reserve space below the
+		// routes rather than a full-height column; journeys run mostly
+		// east-west, so this lets the first view zoom in further.
 		return {
-			top: 72,
+			top: 110,
 			right: 72,
-			bottom: 56,
-			left: Math.min(Math.round(legendRect.width + 56), Math.round(container.clientWidth * 0.34))
+			bottom: Math.min(Math.round(legendRect.height + 40), Math.round(container.clientHeight * 0.5)),
+			left: 56
 		};
 	}
 

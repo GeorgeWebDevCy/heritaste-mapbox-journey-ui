@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.9.0
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,11 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.10.0 =
+* Add a light outline under every route and draw routes slightly thicker so they stay readable on satellite and dark map styles.
+* Make story pins on the route line smaller so the line stays visible between them.
+* Start closer on desktop: the legend now reserves space below the routes instead of a full-height column.
 
 = 1.9.0 =
 * Draw each participant's route as its own line: journeys on the same route are spread into parallel lines instead of overlapping.
