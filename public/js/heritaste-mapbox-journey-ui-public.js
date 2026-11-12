@@ -157,8 +157,13 @@
 			content.appendChild(createTextElement('p', 'heritaste-map-popup__meta', 'Age ' + journey.participant.age));
 		}
 
+		// Each line break from the source content becomes its own paragraph.
 		if (stop.story) {
-			content.appendChild(createTextElement('p', 'heritaste-map-popup__story', stop.story));
+			stop.story.split(/\r?\n+/).forEach(function (paragraph) {
+				if (paragraph.trim()) {
+					content.appendChild(createTextElement('p', 'heritaste-map-popup__story', paragraph.trim()));
+				}
+			});
 		}
 
 

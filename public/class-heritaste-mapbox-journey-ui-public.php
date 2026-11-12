@@ -145,7 +145,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 							<?php foreach ( $journey['stops'] as $stop ) : ?>
 								<li>
 									<strong><?php echo esc_html( $stop['title'] ); ?></strong>
-									<?php if ( '' !== $stop['story'] ) : ?><p><?php echo esc_html( $stop['story'] ); ?></p><?php endif; ?>
+									<?php foreach ( preg_split( '/\R+/', $stop['story'], -1, PREG_SPLIT_NO_EMPTY ) as $paragraph ) : ?><p><?php echo esc_html( trim( $paragraph ) ); ?></p><?php endforeach; ?>
 									<?php if ( '' !== $stop['audio'] && $this->is_video_link( $stop['audio'] ) ) : ?><p><a href="<?php echo esc_url( $stop['audio'] ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Watch the full story', 'heritaste-mapbox-journey-ui' ); ?></a></p><?php elseif ( '' !== $stop['audio'] ) : ?><audio controls preload="none" src="<?php echo esc_url( $stop['audio'] ); ?>"></audio><?php endif; ?>
 									<?php if ( '' !== $stop['document'] ) : ?><p><a href="<?php echo esc_url( $stop['document'] ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $stop['document_label'] ); ?></a></p><?php endif; ?>
 								</li>
