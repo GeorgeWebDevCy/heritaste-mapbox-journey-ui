@@ -405,6 +405,27 @@
 	display: none;
 }
 
+/* Give the panel's close button a comfortable touch target. */
+.heritaste-journey-map .mapboxgl-popup-close-button {
+	top: 6px;
+	right: 6px;
+	width: 36px;
+	height: 36px;
+	padding: 0;
+	border-radius: 50%;
+	background: rgba(255, 250, 242, 0.92);
+	color: var(--heritaste-map-ink);
+	font-size: 1.5rem;
+	line-height: 1;
+}
+
+.heritaste-journey-map .mapboxgl-popup-close-button:hover,
+.heritaste-journey-map .mapboxgl-popup-close-button:focus-visible {
+	background: var(--heritaste-map-surface);
+	outline: 3px solid var(--heritaste-map-ink);
+	outline-offset: 1px;
+}
+
 .heritaste-map-popup__image {
 	display: block;
 	width: 100%;
@@ -561,7 +582,8 @@
 }
 
 @media (max-width: 600px) {
-	.heritaste-journey-map:has(.mapboxgl-popup) .heritaste-map-legend {
+	.heritaste-journey-map:has(.mapboxgl-popup) .heritaste-map-legend,
+	.heritaste-journey-map:has(.mapboxgl-popup) .heritaste-map-style-switcher {
 		display: none;
 	}
 

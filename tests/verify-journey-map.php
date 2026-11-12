@@ -10,7 +10,7 @@ $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-u
 $css         = file_get_contents( $root . '/public/css/heritaste-mapbox-journey-ui-public.css' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.10.0" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.10.1" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -44,6 +44,9 @@ $expectations = array(
 	'Nepal default shared colour'  => array( $public, 'Nepal = #c8102e' ),
 	'Albania default shared colour'=> array( $public, 'Albania = #1f5fa8' ),
 	'Separate line per participant'=> array( $javascript, '(position - ((ids.length - 1) / 2)) * spacing' ),
+	'Panel opens at its top'       => array( $javascript, 'focusAfterOpen: false' ),
+	'Recipe pin from title'        => array( $javascript, "return /recipe/i.test(stop.title || '')" ),
+	'Style box hidden under panel' => array( $css, ':has(.mapboxgl-popup) .heritaste-map-style-switcher' ),
 	'Route contrast casing'        => array( $javascript, "id: sourceId + '-casing'" ),
 	'Legend-aware bottom padding'  => array( $javascript, 'bottom: Math.min(Math.round(legendRect.height + 40)' ),
 	'Shared colour applied'        => array( $public, '$shared_color ?:' ),

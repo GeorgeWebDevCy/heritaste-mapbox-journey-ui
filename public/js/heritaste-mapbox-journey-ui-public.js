@@ -177,8 +177,10 @@
 		return content;
 	}
 
+	// A recipe stop is titled as one ("… A Recipe That Reminds Me of Home") or
+	// carries a recipe document; some partners supply a dish photo but no PDF.
 	function isRecipeStop(stop) {
-		return Boolean(stop.document) && /recipe/i.test((stop.document_label || '') + ' ' + (stop.title || ''));
+		return /recipe/i.test(stop.title || '') || (Boolean(stop.document) && /recipe/i.test(stop.document_label || ''));
 	}
 
 	function getRoutePosition(coordinates, progress) {
@@ -445,8 +447,23 @@
 				marker.appendChild(createRecipeMarkerIcon());
 			}
 
-			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, maxWidth: window.innerWidth <= 600 ? 'calc(100vw - 32px)' : '480px' })
+			// Mapbox would focus the first button in the panel (the listen button
+			// near the bottom), scrolling past the photo and title. Focus the
+			// close button at the top instead and start the panel scrolled up.
+			var popup = new mapboxgl.Popup({ offset: 20, closeButton: true, focusAfterOpen: false, maxWidth: window.innerWidth <= 600 ? 'calc(100vw - 32px)' : '480px' })
 				.setDOMContent(createPopupContent(journey, stop));
+			popup.on('open', function () {
+				var element = popup.getElement();
+				var content = element ? element.querySelector('.mapboxgl-popup-content') : null;
+				var closeButton = element ? element.querySelector('.mapboxgl-popup-close-button') : null;
+				if (content) {
+					content.scrollTop = 0;
+				}
+				if (closeButton) {
+					closeButton.setAttribute('aria-label', 'Close story panel');
+					closeButton.focus({ preventScroll: true });
+				}
+			});
 			new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom', offset: markerOffset })
 				.setLngLat(markerCoordinate)
 				.setPopup(popup)
