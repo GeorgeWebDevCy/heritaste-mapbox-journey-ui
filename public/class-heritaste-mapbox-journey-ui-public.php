@@ -118,16 +118,22 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 				</select>
 			</div>
 			<div class="heritaste-map-zoom-hint" data-zoom-hint hidden>
-				<p role="status"><span class="heritaste-map-zoom-hint__icon" aria-hidden="true">+</span><?php esc_html_e( 'Some places are close together. Use the + button to zoom in and see them clearly.', 'heritaste-mapbox-journey-ui' ); ?></p>
-				<button type="button" class="heritaste-map-zoom-hint__close" data-zoom-hint-close aria-label="<?php esc_attr_e( 'Dismiss zoom tip', 'heritaste-mapbox-journey-ui' ); ?>">&times;</button>
+				<p role="status"><span><?php esc_html_e( 'Choose a pin or a name to see that person’s journey.', 'heritaste-mapbox-journey-ui' ); ?><span class="heritaste-map-zoom-hint__crowded" data-zoom-hint-crowded hidden> <?php esc_html_e( 'Some pins are close together: use the + button to zoom in.', 'heritaste-mapbox-journey-ui' ); ?></span></span></p>
+				<button type="button" class="heritaste-map-zoom-hint__close" data-zoom-hint-close aria-label="<?php esc_attr_e( 'Dismiss tip', 'heritaste-mapbox-journey-ui' ); ?>">&times;</button>
+			</div>
+			<div class="heritaste-map-selection" data-journey-selection hidden>
+				<p role="status"><strong data-journey-selection-name></strong><span><?php esc_html_e( 'Click a pin to read each part of the story.', 'heritaste-mapbox-journey-ui' ); ?></span></p>
+				<button type="button" class="heritaste-map-selection__all" data-journey-show-all><?php esc_html_e( 'Show all participants', 'heritaste-mapbox-journey-ui' ); ?></button>
 			</div>
 			<aside class="heritaste-map-legend" aria-label="<?php esc_attr_e( 'Map legend', 'heritaste-mapbox-journey-ui' ); ?>">
 				<h3><?php esc_html_e( 'Participant journeys', 'heritaste-mapbox-journey-ui' ); ?></h3>
 				<ul>
 					<?php foreach ( $journeys as $journey ) : ?>
 						<li>
-							<span class="heritaste-map-legend__swatch" style="--heritaste-journey-color: <?php echo esc_attr( $journey['color'] ); ?>" aria-hidden="true"></span>
-							<span><strong><?php echo esc_html( $journey['participant']['name'] ); ?></strong><small><?php echo esc_html( $journey['origin_country'] . ' → ' . $journey['destination_country'] ); ?></small></span>
+							<button type="button" class="heritaste-map-legend__item" data-journey-id="<?php echo esc_attr( $journey['id'] ); ?>" aria-pressed="false">
+								<span class="heritaste-map-legend__swatch" style="--heritaste-journey-color: <?php echo esc_attr( $journey['color'] ); ?>" aria-hidden="true"></span>
+								<span><strong><?php echo esc_html( $journey['participant']['name'] ); ?></strong><small><?php echo esc_html( $journey['origin_country'] . ' → ' . $journey['destination_country'] ); ?></small></span>
+							</button>
 						</li>
 					<?php endforeach; ?>
 				</ul>

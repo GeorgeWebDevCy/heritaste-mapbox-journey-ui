@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.13.0
+Stable tag: 1.14.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,10 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.14.0 =
+* Show only one origin pin per participant at first. Choosing a person (their origin pin or their name in the legend) shows their route and story pins and zooms to the journey; other origin pins stay, dimmed. A bar names the selected person and offers "Show all participants"; Escape also returns to the overview.
+* The top tip now explains how to open a journey, adding the zoom advice only while pins are crowded.
 
 = 1.13.0 =
 * Keep pins on land where possible: pins that are moved apart look for the nearest free spot on the same piece of land as their real location, and story or recipe pins on a route line slide along it off the water. Uses bundled, simplified Natural Earth land areas (unnamed, no external requests).

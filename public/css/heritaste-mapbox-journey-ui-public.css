@@ -279,10 +279,43 @@
 }
 
 .heritaste-map-legend li {
+	display: block;
+}
+
+/* Each legend entry is a button that selects that participant's journey. */
+.heritaste-map-legend__item {
 	display: grid;
 	grid-template-columns: 28px minmax(0, 1fr);
 	align-items: center;
 	gap: 10px;
+	width: calc(100% + 16px);
+	margin: -6px -8px;
+	padding: 6px 8px;
+	border: 0;
+	border-radius: 6px;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.heritaste-map-legend__item:hover {
+	background: rgba(42, 36, 30, 0.06);
+}
+
+.heritaste-map-legend__item:focus-visible {
+	outline: 3px solid var(--heritaste-map-ink);
+	outline-offset: 1px;
+}
+
+.heritaste-map-legend__item[aria-pressed="true"] {
+	background: rgba(42, 36, 30, 0.1);
+	box-shadow: inset 3px 0 0 var(--heritaste-map-ink);
+}
+
+.heritaste-map-zoom-hint__crowded[hidden] {
+	display: none;
 }
 
 .heritaste-map-legend__swatch {
@@ -639,6 +672,99 @@
 @media (prefers-reduced-motion: reduce) {
 	.heritaste-map-marker {
 		transition: none;
+	}
+}
+
+/* Origin pins of other participants fade while one journey is selected. */
+.heritaste-map-marker--dimmed {
+	opacity: 0.5;
+}
+
+.heritaste-map-marker--dimmed:hover,
+.heritaste-map-marker--dimmed:focus-visible {
+	opacity: 1;
+}
+
+.heritaste-map-marker--selected::before {
+	box-shadow: 0 0 0 3px var(--heritaste-map-surface), 0 0 0 6px var(--heritaste-marker-color, #c45432), 0 3px 12px rgba(42, 36, 30, 0.32);
+}
+
+/* Bar naming the selected participant, with a way back to everyone. */
+.heritaste-map-selection {
+	position: absolute;
+	z-index: 5;
+	top: 24px;
+	left: 50%;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	max-width: min(560px, calc(100% - 520px));
+	padding: 8px 8px 8px 14px;
+	border: 1px solid rgba(184, 170, 156, 0.72);
+	border-radius: 8px;
+	background: rgba(255, 250, 242, 0.97);
+	box-shadow: 0 8px 24px rgba(42, 36, 30, 0.16);
+	color: var(--heritaste-map-ink);
+	transform: translateX(-50%);
+}
+
+.heritaste-map-selection[hidden] {
+	display: none;
+}
+
+.heritaste-map-selection p {
+	display: grid;
+	gap: 2px;
+	margin: 0;
+	font-size: 0.82rem;
+	line-height: 1.3;
+}
+
+.heritaste-map-selection strong {
+	font-size: 0.95rem;
+}
+
+.heritaste-map-selection__all {
+	flex: 0 0 auto;
+	min-height: 36px;
+	padding: 6px 12px;
+	border: 1px solid var(--heritaste-map-ink);
+	border-radius: 999px;
+	background: var(--heritaste-map-ink);
+	color: var(--heritaste-map-surface);
+	font: inherit;
+	font-size: 0.82rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.heritaste-map-selection__all:hover,
+.heritaste-map-selection__all:focus-visible {
+	outline: 3px solid var(--heritaste-map-ink);
+	outline-offset: 2px;
+}
+
+.heritaste-journey-map:has(.mapboxgl-popup) .heritaste-map-selection {
+	display: none;
+}
+
+@media (max-width: 600px) {
+	.heritaste-map-selection {
+		top: 68px;
+		left: 16px;
+		right: 72px;
+		max-width: none;
+		padding: 6px 6px 6px 10px;
+		transform: none;
+	}
+
+	.heritaste-map-selection p {
+		font-size: 0.76rem;
+	}
+
+	/* The selection bar needs the room; the style box returns with the overview. */
+	.heritaste-journey-map:has(.heritaste-map-selection:not([hidden])) .heritaste-map-style-switcher {
+		display: none;
 	}
 }
 

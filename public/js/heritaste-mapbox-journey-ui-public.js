@@ -384,8 +384,8 @@
 		// looks for the nearest free spot in its own area (e.g. a Greek pin
 		// stays in Greece, never Turkey). Pins whose true place is not inside
 		// an outline are left alone.
-		function keepOnLand(positions, origins) {
-			entries.forEach(function (entry, index) {
+		function keepOnLand(active, positions, origins) {
+			active.forEach(function (entry, index) {
 				if (entry.landId < 0) {
 					return;
 				}
@@ -449,9 +449,13 @@
 
 		function layout() {
 			frame = 0;
+			// Only pins currently shown on the map take part.
+			var active = entries.filter(function (entry) {
+				return !entry.hidden;
+			});
 			// Compare the visible heads of the pins: location pins hang above
 			// their tip, recipe plates are centred on their point.
-			var origins = entries.map(function (entry) {
+			var origins = active.map(function (entry) {
 				var point = map.project(entry.lngLat);
 				return { x: point.x, y: point.y - entry.headLift };
 			});
@@ -496,14 +500,26 @@
 				}
 			}
 
+			// Spreading must not push a pin whose real place is on screen off
+			// the edge of the map.
+			var canvas = map.getContainer();
+			var edge = 16;
+			positions.forEach(function (position, index) {
+				var origin = origins[index];
+				if (origin.x < 0 || origin.x > canvas.clientWidth || origin.y < 0 || origin.y > canvas.clientHeight) {
+					return;
+				}
+				position.x = Math.min(Math.max(position.x, edge), canvas.clientWidth - edge);
+				position.y = Math.min(Math.max(position.y, edge + 14), canvas.clientHeight - edge);
+			});
+
 			if (landAt && !moving) {
-				keepOnLand(positions, origins);
+				keepOnLand(active, positions, origins);
 			}
 
 			// Only pins inside the visible map count towards "crowded".
-			var canvas = map.getContainer();
 			var largestShift = 0;
-			entries.forEach(function (entry, index) {
+			active.forEach(function (entry, index) {
 				var offsetX = positions[index].x - origins[index].x;
 				var offsetY = positions[index].y - origins[index].y;
 				var onScreen = origins[index].x >= 0 && origins[index].y >= 0 && origins[index].x <= canvas.clientWidth && origins[index].y <= canvas.clientHeight;
@@ -540,8 +556,26 @@
 		});
 
 		return {
+			// Markers start hidden; setHidden adds them to or removes them from
+			// the map.
 			add: function (marker, lngLat, headLift, route, fraction) {
-				entries.push({ marker: marker, lngLat: lngLat, headLift: headLift || 0, route: route || null, fraction: fraction, landId: -1 });
+				var entry = { marker: marker, lngLat: lngLat, headLift: headLift || 0, route: route || null, fraction: fraction, landId: -1, hidden: true };
+				entries.push(entry);
+				return entry;
+			},
+			setHidden: function (entry, hidden) {
+				if (entry.hidden === hidden) {
+					return;
+				}
+				entry.hidden = hidden;
+				if (hidden) {
+					entry.marker.remove();
+				} else {
+					entry.marker.addTo(map);
+					// Mapbox marks marker elements as images; ours are buttons.
+					entry.marker.getElement().removeAttribute('role');
+				}
+				schedule();
 			},
 			setLand: function (lookup) {
 				landAt = lookup;
@@ -555,92 +589,62 @@
 		};
 	}
 
-	// Journeys sharing a colour (e.g. one origin country) share one line offset
-	// so their identical routes draw as a single line.
-	// Journeys that follow the same route (e.g. everyone from Nepal to Cyprus)
-	// are drawn as parallel lines 6px apart, so each participant keeps
-	// a visible line of their own while sharing their origin country's colour.
-	function buildRouteOffsets(journeys) {
-		var spacing = 6;
-		var groups = {};
+	// Route lines start hidden; only the selected participant's route shows.
+	function addRouteLayers(map, journey, index) {
+		var routeCoordinates = getRouteCoordinates(journey);
+		if (routeCoordinates.length < 2) {
+			return [];
+		}
 
-		journeys.forEach(function (journey) {
-			var routeKey = getRouteCoordinates(journey).map(function (coordinate) {
-				return Number(coordinate[0]).toFixed(2) + ',' + Number(coordinate[1]).toFixed(2);
-			}).join(';');
-			(groups[routeKey] = groups[routeKey] || []).push(journey.id);
-		});
-
-		var offsets = {};
-		Object.keys(groups).forEach(function (routeKey) {
-			var ids = groups[routeKey];
-			ids.forEach(function (id, position) {
-				offsets[id] = (position - ((ids.length - 1) / 2)) * spacing;
+		var sourceId = 'heritaste-route-' + journey.id + '-' + index;
+		if (!map.getSource(sourceId)) {
+			map.addSource(sourceId, {
+				type: 'geojson',
+				data: {
+					type: 'Feature',
+					properties: { participant: journey.participant.name },
+					geometry: { type: 'LineString', coordinates: routeCoordinates }
+				}
 			});
-		});
+		}
 
-		return offsets;
+		// A light casing under the route keeps it readable over satellite
+		// imagery and dark map styles.
+		if (!map.getLayer(sourceId + '-casing')) {
+			map.addLayer({
+				id: sourceId + '-casing',
+				type: 'line',
+				source: sourceId,
+				layout: { 'line-cap': 'round', 'line-join': 'round', visibility: 'none' },
+				paint: {
+					'line-color': '#fffaf2',
+					'line-width': 7,
+					'line-opacity': 0.9
+				}
+			});
+		}
+
+		if (!map.getLayer(sourceId)) {
+			map.addLayer({
+				id: sourceId,
+				type: 'line',
+				source: sourceId,
+				layout: { 'line-cap': 'round', 'line-join': 'round', visibility: 'none' },
+				paint: {
+					'line-color': journey.color,
+					'line-width': 4,
+					'line-opacity': 0.95
+				}
+			});
+		}
+
+		return [sourceId + '-casing', sourceId];
 	}
 
-	function addJourney(map, journey, bounds, index, routeOffset, markerSpreader, addMarkers) {
-		var routeCoordinates = getRouteCoordinates(journey);
+	function addJourneyMarkers(map, journey, markerSpreader, onMarkerClick) {
 		var placements = getMarkerPlacements(journey);
 
-		routeCoordinates.forEach(function (coordinate) {
-			bounds.extend(coordinate);
-		});
-
-		if (routeCoordinates.length > 1) {
-			var sourceId = 'heritaste-route-' + journey.id + '-' + index;
-			if (!map.getSource(sourceId)) {
-				map.addSource(sourceId, {
-					type: 'geojson',
-					data: {
-						type: 'Feature',
-						properties: { participant: journey.participant.name },
-						geometry: { type: 'LineString', coordinates: routeCoordinates }
-					}
-				});
-			}
-
-			// A light casing under each route keeps it readable over satellite
-			// imagery and dark map styles.
-			if (!map.getLayer(sourceId + '-casing')) {
-				map.addLayer({
-					id: sourceId + '-casing',
-					type: 'line',
-					source: sourceId,
-					layout: { 'line-cap': 'round', 'line-join': 'round' },
-					paint: {
-						'line-color': '#fffaf2',
-						'line-width': 6.5,
-						'line-opacity': 0.9,
-						'line-offset': routeOffset
-					}
-				});
-			}
-
-			if (!map.getLayer(sourceId)) {
-				map.addLayer({
-					id: sourceId,
-					type: 'line',
-					source: sourceId,
-					layout: { 'line-cap': 'round', 'line-join': 'round' },
-					paint: {
-						'line-color': journey.color,
-						'line-width': 3.5,
-						'line-opacity': 0.95,
-						'line-offset': routeOffset
-					}
-				});
-			}
-		}
-
-		if (!addMarkers) {
-			return;
-		}
-
-		journey.stops.forEach(function (stop, stopIndex) {
+		return journey.stops.map(function (stop, stopIndex) {
 			var marker = document.createElement('button');
 			var placement = placements[stopIndex];
 			var recipeStop = placement.recipe;
@@ -677,10 +681,23 @@
 					closeButton.focus({ preventScroll: true });
 				}
 			});
-			markerSpreader.add(new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom' })
-				.setLngLat(markerCoordinate)
-				.setPopup(popup)
-				.addTo(map), markerCoordinate, recipeStop ? 0 : 14, placement.onRoute ? placement.route : null, placement.fraction);
+
+			var mapMarker = new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom' }).setLngLat(markerCoordinate);
+			var item = {
+				marker: mapMarker,
+				element: marker,
+				popup: popup,
+				isOrigin: stopType === 'start',
+				entry: markerSpreader.add(mapMarker, markerCoordinate, recipeStop ? 0 : 14, placement.onRoute ? placement.route : null, placement.fraction)
+			};
+			// Keep the click from reaching the map, which would close the story
+			// panel this click opens.
+			marker.addEventListener('click', function (event) {
+				event.stopPropagation();
+				onMarkerClick(journey, item);
+			});
+
+			return item;
 		});
 	}
 
@@ -692,9 +709,9 @@
 		if (isNarrow) {
 			return {
 				top: 88,
-				right: 48,
+				right: 64,
 				bottom: Math.min(Math.round(legendRect.height + 32), Math.round(container.clientHeight * 0.42)),
-				left: 32
+				left: 48
 			};
 		}
 
@@ -709,16 +726,17 @@
 		};
 	}
 
-	function fitMapToJourneyData(map, bounds, container) {
+	function fitMapToJourneyData(map, bounds, container, animate, maxZoom) {
 		if (bounds.isEmpty()) {
 			return;
 		}
 
+		var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 		map.resize();
 		map.fitBounds(bounds, {
 			padding: getInitialMapPadding(container),
-			maxZoom: 5,
-			duration: 0
+			maxZoom: maxZoom || 5,
+			duration: animate && !reduceMotion ? 900 : 0
 		});
 	}
 
@@ -730,14 +748,24 @@
 
 		var payload;
 		var styleSelector = container.parentElement ? container.parentElement.querySelector('[data-map-style-selector]') : null;
-		var zoomHint = container.parentElement ? container.parentElement.querySelector('[data-zoom-hint]') : null;
+		var wrapper = container.parentElement || document;
+		var zoomHint = wrapper.querySelector('[data-zoom-hint]');
+		var zoomHintCrowded = wrapper.querySelector('[data-zoom-hint-crowded]');
 		var zoomHintDismissed = false;
+		var selectionBar = wrapper.querySelector('[data-journey-selection]');
+		var selectionName = wrapper.querySelector('[data-journey-selection-name]');
+		var legendButtons = Array.prototype.slice.call(wrapper.querySelectorAll('[data-journey-id]'));
+		var selectedId = null;
 
-		// Shows the "places are close together" tip only while pins have to be
-		// pushed apart to stay clickable; it hides once zoomed in far enough.
+		// The overview tip explains how to open a journey; its "close together"
+		// sentence shows only while pins have to be pushed apart to stay
+		// clickable. The selection bar replaces it while a journey is open.
 		function updateZoomHint(largestShift) {
 			if (zoomHint) {
-				zoomHint.hidden = zoomHintDismissed || largestShift < 8;
+				zoomHint.hidden = zoomHintDismissed || selectedId !== null;
+			}
+			if (zoomHintCrowded) {
+				zoomHintCrowded.hidden = largestShift < 8;
 			}
 		}
 
@@ -770,15 +798,127 @@
 		map.scrollZoom.disable();
 
 		map.on('load', function () {
-			var bounds = new mapboxgl.LngLatBounds();
+			var allBounds = new mapboxgl.LngLatBounds();
 			var markerSpreader = createMarkerSpreader(map, updateZoomHint);
-			var routeOffsets = buildRouteOffsets(payload.journeys);
-			payload.journeys.forEach(function (journey, index) {
-				addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerSpreader, true);
+			var openPopup = null;
+			var states;
+
+			function closeOpenPopup() {
+				if (openPopup) {
+					openPopup.remove();
+					openPopup = null;
+				}
+			}
+
+			// Overview: only origin pins. Selecting a participant shows their
+			// route and all their pins; the other origin pins stay, dimmed, so
+			// another participant can be chosen.
+			function applySelection() {
+				states.forEach(function (state) {
+					var selected = state.journey.id === selectedId;
+					state.layers.forEach(function (layerId) {
+						if (map.getLayer(layerId)) {
+							map.setLayoutProperty(layerId, 'visibility', selected ? 'visible' : 'none');
+						}
+					});
+					state.items.forEach(function (item) {
+						var show = item.isOrigin || selected;
+						if (!show && openPopup === item.popup) {
+							closeOpenPopup();
+						}
+						markerSpreader.setHidden(item.entry, !show);
+						if (item.isOrigin) {
+							item.element.classList.toggle('heritaste-map-marker--selected', selected);
+							item.element.classList.toggle('heritaste-map-marker--dimmed', selectedId !== null && !selected);
+						}
+					});
+				});
+
+				legendButtons.forEach(function (button) {
+					button.setAttribute('aria-pressed', String(Number(button.getAttribute('data-journey-id')) === selectedId));
+				});
+
+				var current = states.filter(function (state) {
+					return state.journey.id === selectedId;
+				})[0];
+				if (selectionBar) {
+					selectionBar.hidden = !current;
+				}
+				if (selectionName && current) {
+					selectionName.textContent = current.journey.participant.name;
+				}
+				if (zoomHint) {
+					zoomHint.hidden = zoomHintDismissed || Boolean(current);
+				}
+			}
+
+			function selectJourney(journeyId) {
+				selectedId = journeyId;
+				closeOpenPopup();
+				applySelection();
+				var current = states.filter(function (state) {
+					return state.journey.id === selectedId;
+				})[0];
+				fitMapToJourneyData(map, current ? current.bounds : allBounds, container, true, current ? 6 : 5);
+			}
+
+			function handleMarkerClick(journey, item) {
+				if (item.isOrigin && selectedId !== journey.id) {
+					selectJourney(journey.id);
+					return;
+				}
+				if (openPopup && openPopup !== item.popup) {
+					closeOpenPopup();
+				}
+				openPopup = item.popup;
+				item.popup.setLngLat(item.marker.getLngLat()).addTo(map);
+				item.popup.once('close', function () {
+					if (openPopup === item.popup) {
+						openPopup = null;
+					}
+				});
+			}
+
+			states = payload.journeys.map(function (journey, index) {
+				var bounds = new mapboxgl.LngLatBounds();
+				getRouteCoordinates(journey).forEach(function (coordinate) {
+					bounds.extend(coordinate);
+					allBounds.extend(coordinate);
+				});
+				return {
+					journey: journey,
+					index: index,
+					bounds: bounds,
+					layers: addRouteLayers(map, journey, index),
+					items: addJourneyMarkers(map, journey, markerSpreader, handleMarkerClick)
+				};
+			});
+			applySelection();
+
+			legendButtons.forEach(function (button) {
+				button.addEventListener('click', function () {
+					var journeyId = Number(button.getAttribute('data-journey-id'));
+					selectJourney(selectedId === journeyId ? null : journeyId);
+				});
+			});
+
+			var showAll = wrapper.querySelector('[data-journey-show-all]');
+			if (showAll) {
+				showAll.addEventListener('click', function () {
+					selectJourney(null);
+				});
+			}
+
+			// Escape returns to the overview when no story or video is open.
+			document.addEventListener('keydown', function (event) {
+				if (event.key !== 'Escape' || selectedId === null || openPopup || document.querySelector('.heritaste-video-dialog[open]')) {
+					return;
+				}
+				selectJourney(null);
 			});
 
 			window.requestAnimationFrame(function () {
-				fitMapToJourneyData(map, bounds, container);
+				fitMapToJourneyData(map, allBounds, container);
 				markerSpreader.update();
 			});
 
@@ -802,9 +942,10 @@
 					var nextStyle = styleSelector.value;
 					styleSelector.disabled = true;
 					map.once('style.load', function () {
-						payload.journeys.forEach(function (journey, index) {
-							addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerSpreader, false);
+						states.forEach(function (state) {
+							state.layers = addRouteLayers(map, state.journey, state.index);
 						});
+						applySelection();
 						container.setAttribute('data-active-map-style', nextStyle);
 						styleSelector.disabled = false;
 					});
