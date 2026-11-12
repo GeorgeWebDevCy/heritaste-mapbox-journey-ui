@@ -7,7 +7,7 @@
  */
 class Heritaste_Mapbox_Journey_Ui_Public {
 
-	const DEFAULT_ORIGIN_ROUTE_COLORS = 'Nepal = #c8102e';
+	const DEFAULT_ORIGIN_ROUTE_COLORS = "Nepal = #c8102e\nAlbania = #1f5fa8";
 
 	private $plugin_name;
 	private $version;

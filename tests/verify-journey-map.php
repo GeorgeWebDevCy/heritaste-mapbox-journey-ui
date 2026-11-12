@@ -10,7 +10,7 @@ $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-u
 $css         = file_get_contents( $root . '/public/css/heritaste-mapbox-journey-ui-public.css' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.8.0" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.9.0" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -41,7 +41,9 @@ $expectations = array(
 	'Endpoint and route pools'     => array( $javascript, "var pool = placement.onRoute ? 'route' : 'endpoint'" ),
 	'Marker proximity grouping'    => array( $javascript, 'Math.abs(candidate.longitude - longitude) <= tolerance' ),
 	'Shared origin colour setting' => array( $admin, "'heritaste_origin_route_colors'" ),
-	'Nepal default shared colour'  => array( $public, "DEFAULT_ORIGIN_ROUTE_COLORS = 'Nepal = #c8102e'" ),
+	'Nepal default shared colour'  => array( $public, 'Nepal = #c8102e' ),
+	'Albania default shared colour'=> array( $public, 'Albania = #1f5fa8' ),
+	'Separate line per participant'=> array( $javascript, '(position - ((ids.length - 1) / 2)) * spacing' ),
 	'Shared colour applied'        => array( $public, '$shared_color ?:' ),
 	'Shared-colour route overlay'  => array( $javascript, 'buildRouteOffsets(payload.journeys)' ),
 	'Origin pin name on hover'     => array( $javascript, "'heritaste-map-marker__name', journey.participant.name" ),

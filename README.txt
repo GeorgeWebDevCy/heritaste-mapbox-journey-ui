@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.8.0
+Stable tag: 1.9.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,10 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.9.0 =
+* Draw each participant's route as its own line: journeys on the same route are spread into parallel lines instead of overlapping.
+* Add Albania (#1f5fa8) to the default shared origin-country route colours alongside Nepal.
 
 = 1.8.0 =
 * Play YouTube story videos in a dialog over the map instead of leaving the page. The player loads only on click, uses YouTube's privacy-enhanced (no-cookie) domain, and stops when closed.

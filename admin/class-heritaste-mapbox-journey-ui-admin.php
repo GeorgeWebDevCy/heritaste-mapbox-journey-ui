@@ -184,7 +184,7 @@ class Heritaste_Mapbox_Journey_Ui_Admin {
 			'<textarea class="large-text code" rows="4" id="heritaste_origin_route_colors" name="heritaste_origin_route_colors" aria-describedby="heritaste-origin-route-colors-help">%s</textarea>',
 			esc_textarea( $value )
 		);
-		echo '<p class="description" id="heritaste-origin-route-colors-help">' . esc_html__( 'One line per country, for example "Nepal = #c8102e". Every journey whose origin country matches uses this route colour instead of its own.', 'heritaste-mapbox-journey-ui' ) . '</p>';
+		echo '<p class="description" id="heritaste-origin-route-colors-help">' . esc_html__( 'One line per country, for example "Nepal = #c8102e". Every journey whose origin country matches uses this route colour instead of its own; participants on the same route still get separate parallel lines.', 'heritaste-mapbox-journey-ui' ) . '</p>';
 	}
 
 	/**

@@ -340,17 +340,26 @@
 
 	// Journeys sharing a colour (e.g. one origin country) share one line offset
 	// so their identical routes draw as a single line.
+	// Journeys that follow the same route (e.g. everyone from Nepal to Cyprus)
+	// are drawn as parallel lines a few pixels apart, so each participant keeps
+	// a visible line of their own while sharing their origin country's colour.
 	function buildRouteOffsets(journeys) {
-		var colors = [];
+		var spacing = 5;
+		var groups = {};
+
 		journeys.forEach(function (journey) {
-			if (colors.indexOf(journey.color) === -1) {
-				colors.push(journey.color);
-			}
+			var routeKey = getRouteCoordinates(journey).map(function (coordinate) {
+				return Number(coordinate[0]).toFixed(2) + ',' + Number(coordinate[1]).toFixed(2);
+			}).join(';');
+			(groups[routeKey] = groups[routeKey] || []).push(journey.id);
 		});
 
 		var offsets = {};
-		journeys.forEach(function (journey) {
-			offsets[journey.id] = (colors.indexOf(journey.color) - ((colors.length - 1) / 2)) * 2;
+		Object.keys(groups).forEach(function (routeKey) {
+			var ids = groups[routeKey];
+			ids.forEach(function (id, position) {
+				offsets[id] = (position - ((ids.length - 1) / 2)) * spacing;
+			});
 		});
 
 		return offsets;
