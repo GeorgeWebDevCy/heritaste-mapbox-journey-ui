@@ -284,60 +284,94 @@
 		});
 	}
 
-	function buildMarkerOffsets(journeys) {
-		var markerGroups = [];
-		var offsets = {};
+	// Nudges apart pins that overlap on screen, recalculated as the map moves.
+	// Overlapping pins push each other away just enough to stay separately
+	// clickable while being pulled back towards their true place, so a busy
+	// area (e.g. all of Greece at a wide view) stays compact and in roughly the
+	// right direction. Once zoomed in far enough, pins sit exactly on their
+	// coordinates again.
+	function createMarkerSpreader(map) {
+		var entries = [];
+		var frame = 0;
+		var minimumGap = 32;
+		var iterations = 60;
+		var pullBack = 0.04;
 
-		journeys.forEach(function (journey) {
-			var placements = getMarkerPlacements(journey);
-			offsets[journey.id] = journey.stops.map(function () {
-				return [0, 0];
+		function layout() {
+			frame = 0;
+			// Compare the visible heads of the pins: location pins hang above
+			// their tip, recipe plates are centred on their point.
+			var origins = entries.map(function (entry) {
+				var point = map.project(entry.lngLat);
+				return { x: point.x, y: point.y - entry.headLift };
+			});
+			var positions = origins.map(function (point) {
+				return { x: point.x, y: point.y };
 			});
 
-			placements.forEach(function (placement, stopIndex) {
-				var isEndpoint = stopIndex === 0 || stopIndex === journey.stops.length - 1;
-				if (!isEndpoint && !placement.onRoute) {
-					return;
+			for (var step = 0; step < iterations; step += 1) {
+				var moved = false;
+				for (var first = 0; first < positions.length; first += 1) {
+					for (var second = first + 1; second < positions.length; second += 1) {
+						var dx = positions[second].x - positions[first].x;
+						var dy = positions[second].y - positions[first].y;
+						var distance = Math.sqrt((dx * dx) + (dy * dy));
+						if (distance >= minimumGap) {
+							continue;
+						}
+						if (distance < 0.01) {
+							// Identical points: separate them in a stable direction.
+							var angle = (first * 2.399963) + second;
+							dx = Math.cos(angle);
+							dy = Math.sin(angle);
+							distance = 1;
+						} else {
+							dx /= distance;
+							dy /= distance;
+						}
+						var push = (minimumGap - Math.max(distance, 0)) / 2;
+						positions[first].x -= dx * push;
+						positions[first].y -= dy * push;
+						positions[second].x += dx * push;
+						positions[second].y += dy * push;
+						moved = true;
+					}
 				}
-
-				// Endpoints group by proximity within a country area; on-route
-				// markers only group when journeys share almost the same line.
-				var pool = placement.onRoute ? 'route' : 'endpoint';
-				var tolerance = placement.onRoute ? 0.5 : 5;
-				var longitude = Number(placement.coordinate[0]);
-				var latitude = Number(placement.coordinate[1]);
-				var group = markerGroups.find(function (candidate) {
-					return candidate.pool === pool && Math.abs(candidate.longitude - longitude) <= tolerance && Math.abs(candidate.latitude - latitude) <= tolerance;
+				positions.forEach(function (position, index) {
+					position.x += (origins[index].x - position.x) * pullBack;
+					position.y += (origins[index].y - position.y) * pullBack;
 				});
-
-				if (!group) {
-					group = { pool: pool, longitude: longitude, latitude: latitude, markers: [] };
-					markerGroups.push(group);
+				if (!moved) {
+					break;
 				}
-
-				group.markers.push({ journeyId: journey.id, stopIndex: stopIndex });
-			});
-		});
-
-		markerGroups.forEach(function (group) {
-			if (group.markers.length < 2) {
-				return;
 			}
 
-			// Grow the ring with the group size so neighbouring pins stay
-			// separately hoverable and clickable.
-			var halfSpacing = group.pool === 'route' ? 19 : 15;
-			var radius = Math.max(group.pool === 'route' ? 20 : 16, halfSpacing / Math.sin(Math.PI / group.markers.length));
-			group.markers.forEach(function (entry, occurrence) {
-				var angle = Math.PI * 2 * occurrence / group.markers.length;
-				offsets[entry.journeyId][entry.stopIndex] = [
-					Math.cos(angle) * radius,
-					Math.sin(angle) * radius
-				];
+			entries.forEach(function (entry, index) {
+				var offsetX = positions[index].x - origins[index].x;
+				var offsetY = positions[index].y - origins[index].y;
+				if (Math.abs(offsetX) < 0.5 && Math.abs(offsetY) < 0.5) {
+					entry.marker.setOffset([0, 0]);
+				} else {
+					entry.marker.setOffset([offsetX, offsetY]);
+				}
 			});
-		});
+		}
 
-		return offsets;
+		function schedule() {
+			if (!frame) {
+				frame = window.requestAnimationFrame(layout);
+			}
+		}
+
+		map.on('move', schedule);
+		map.on('resize', schedule);
+
+		return {
+			add: function (marker, lngLat, headLift) {
+				entries.push({ marker: marker, lngLat: lngLat, headLift: headLift || 0 });
+			},
+			update: schedule
+		};
 	}
 
 	// Journeys sharing a colour (e.g. one origin country) share one line offset
@@ -367,9 +401,8 @@
 		return offsets;
 	}
 
-	function addJourney(map, journey, bounds, index, routeOffset, markerOffsets, addMarkers) {
+	function addJourney(map, journey, bounds, index, routeOffset, markerSpreader, addMarkers) {
 		var routeCoordinates = getRouteCoordinates(journey);
-		var journeyMarkerOffsets = markerOffsets[journey.id] || [];
 		var placements = getMarkerPlacements(journey);
 
 		routeCoordinates.forEach(function (coordinate) {
@@ -432,7 +465,6 @@
 			var recipeStop = placement.recipe;
 			var stopType = recipeStop ? 'recipe' : (stopIndex === 0 ? 'start' : (stopIndex === journey.stops.length - 1 ? 'end' : 'stop'));
 			var markerCoordinate = placement.coordinate;
-			var markerOffset = journeyMarkerOffsets[stopIndex] || [0, 0];
 			marker.type = 'button';
 			marker.className = 'heritaste-map-marker heritaste-map-marker--' + stopType;
 			marker.style.setProperty('--heritaste-marker-color', journey.color);
@@ -464,10 +496,10 @@
 					closeButton.focus({ preventScroll: true });
 				}
 			});
-			new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom', offset: markerOffset })
+			markerSpreader.add(new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom' })
 				.setLngLat(markerCoordinate)
 				.setPopup(popup)
-				.addTo(map);
+				.addTo(map), markerCoordinate, recipeStop ? 0 : 14);
 		});
 	}
 
@@ -538,14 +570,15 @@
 
 		map.on('load', function () {
 			var bounds = new mapboxgl.LngLatBounds();
-			var markerOffsets = buildMarkerOffsets(payload.journeys);
+			var markerSpreader = createMarkerSpreader(map);
 			var routeOffsets = buildRouteOffsets(payload.journeys);
 			payload.journeys.forEach(function (journey, index) {
-				addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerOffsets, true);
+				addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerSpreader, true);
 			});
 
 			window.requestAnimationFrame(function () {
 				fitMapToJourneyData(map, bounds, container);
+				markerSpreader.update();
 			});
 
 			if (styleSelector) {
@@ -554,7 +587,7 @@
 					styleSelector.disabled = true;
 					map.once('style.load', function () {
 						payload.journeys.forEach(function (journey, index) {
-							addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerOffsets, false);
+							addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerSpreader, false);
 						});
 						container.setAttribute('data-active-map-style', nextStyle);
 						styleSelector.disabled = false;

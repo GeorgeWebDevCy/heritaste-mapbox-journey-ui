@@ -10,7 +10,7 @@ $javascript  = file_get_contents( $root . '/public/js/heritaste-mapbox-journey-u
 $css         = file_get_contents( $root . '/public/css/heritaste-mapbox-journey-ui-public.css' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.10.1" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.11.0" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -36,10 +36,6 @@ $expectations = array(
 	'Albania to Greece demo'       => array( $admin, "'[Demo] Milan - Albania to Greece'" ),
 	'Africa to Italy demo'         => array( $admin, "'[Demo] Tara - Africa to Italy'" ),
 	'Keyboard-labelled marker'     => array( $javascript, "marker.setAttribute('aria-label'" ),
-	'Overlapping-point separation' => array( $javascript, 'buildMarkerOffsets' ),
-	'Pixel-based marker offset'    => array( $javascript, 'offset: markerOffset' ),
-	'Endpoint and route pools'     => array( $javascript, "var pool = placement.onRoute ? 'route' : 'endpoint'" ),
-	'Marker proximity grouping'    => array( $javascript, 'Math.abs(candidate.longitude - longitude) <= tolerance' ),
 	'Shared origin colour setting' => array( $admin, "'heritaste_origin_route_colors'" ),
 	'Nepal default shared colour'  => array( $public, 'Nepal = #c8102e' ),
 	'Albania default shared colour'=> array( $public, 'Albania = #1f5fa8' ),
@@ -47,6 +43,9 @@ $expectations = array(
 	'Panel opens at its top'       => array( $javascript, 'focusAfterOpen: false' ),
 	'Recipe pin from title'        => array( $javascript, "return /recipe/i.test(stop.title || '')" ),
 	'Style box hidden under panel' => array( $css, ':has(.mapboxgl-popup) .heritaste-map-style-switcher' ),
+	'Screen-space pin spreading'   => array( $javascript, 'createMarkerSpreader(map)' ),
+	'Spreading follows the view'   => array( $javascript, "map.on('move', schedule)" ),
+	'Pins return to true place'    => array( $javascript, 'marker.setOffset([0, 0])' ),
 	'Route contrast casing'        => array( $javascript, "id: sourceId + '-casing'" ),
 	'Legend-aware bottom padding'  => array( $javascript, 'bottom: Math.min(Math.round(legendRect.height + 40)' ),
 	'Shared colour applied'        => array( $public, '$shared_color ?:' ),

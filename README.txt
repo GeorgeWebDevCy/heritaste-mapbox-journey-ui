@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.10.1
+Stable tag: 1.11.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,9 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.11.0 =
+* Spread overlapping pins on screen as the map moves: crowded areas such as Greece fan out just enough for every pin to be clickable, and pins return to their exact coordinates once zoomed in.
 
 = 1.10.1 =
 * Open story panels at the top (photo and title first) and move keyboard focus to the panel's close button.
