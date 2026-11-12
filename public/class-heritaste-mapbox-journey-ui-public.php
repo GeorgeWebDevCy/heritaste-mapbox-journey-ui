@@ -117,6 +117,10 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 					<option value="mapbox://styles/mapbox/dark-v11"><?php esc_html_e( 'Dark', 'heritaste-mapbox-journey-ui' ); ?></option>
 				</select>
 			</div>
+			<div class="heritaste-map-zoom-hint" data-zoom-hint hidden>
+				<p role="status"><span class="heritaste-map-zoom-hint__icon" aria-hidden="true">+</span><?php esc_html_e( 'Some places are close together. Use the + button to zoom in and see them clearly.', 'heritaste-mapbox-journey-ui' ); ?></p>
+				<button type="button" class="heritaste-map-zoom-hint__close" data-zoom-hint-close aria-label="<?php esc_attr_e( 'Dismiss zoom tip', 'heritaste-mapbox-journey-ui' ); ?>">&times;</button>
+			</div>
 			<aside class="heritaste-map-legend" aria-label="<?php esc_attr_e( 'Map legend', 'heritaste-mapbox-journey-ui' ); ?>">
 				<h3><?php esc_html_e( 'Participant journeys', 'heritaste-mapbox-journey-ui' ); ?></h3>
 				<ul>

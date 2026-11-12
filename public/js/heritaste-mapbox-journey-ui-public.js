@@ -295,7 +295,7 @@
 	// area (e.g. all of Greece at a wide view) stays compact and in roughly the
 	// right direction. Once zoomed in far enough, pins sit exactly on their
 	// coordinates again.
-	function createMarkerSpreader(map) {
+	function createMarkerSpreader(map, onLayout) {
 		var entries = [];
 		var frame = 0;
 		var minimumGap = 32;
@@ -351,15 +351,26 @@
 				}
 			}
 
+			// Only pins inside the visible map count towards "crowded".
+			var canvas = map.getContainer();
+			var largestShift = 0;
 			entries.forEach(function (entry, index) {
 				var offsetX = positions[index].x - origins[index].x;
 				var offsetY = positions[index].y - origins[index].y;
+				var onScreen = origins[index].x >= 0 && origins[index].y >= 0 && origins[index].x <= canvas.clientWidth && origins[index].y <= canvas.clientHeight;
+				if (onScreen) {
+					largestShift = Math.max(largestShift, Math.sqrt((offsetX * offsetX) + (offsetY * offsetY)));
+				}
 				if (Math.abs(offsetX) < 0.5 && Math.abs(offsetY) < 0.5) {
 					entry.marker.setOffset([0, 0]);
 				} else {
 					entry.marker.setOffset([offsetX, offsetY]);
 				}
 			});
+
+			if (onLayout) {
+				onLayout(largestShift);
+			}
 		}
 
 		function schedule() {
@@ -554,6 +565,26 @@
 
 		var payload;
 		var styleSelector = container.parentElement ? container.parentElement.querySelector('[data-map-style-selector]') : null;
+		var zoomHint = container.parentElement ? container.parentElement.querySelector('[data-zoom-hint]') : null;
+		var zoomHintDismissed = false;
+
+		// Shows the "places are close together" tip only while pins have to be
+		// pushed apart to stay clickable; it hides once zoomed in far enough.
+		function updateZoomHint(largestShift) {
+			if (zoomHint) {
+				zoomHint.hidden = zoomHintDismissed || largestShift < 8;
+			}
+		}
+
+		if (zoomHint) {
+			var zoomHintClose = zoomHint.querySelector('[data-zoom-hint-close]');
+			if (zoomHintClose) {
+				zoomHintClose.addEventListener('click', function () {
+					zoomHintDismissed = true;
+					zoomHint.hidden = true;
+				});
+			}
+		}
 		try {
 			payload = JSON.parse(payloadElement.textContent);
 		} catch (error) {
@@ -575,7 +606,7 @@
 
 		map.on('load', function () {
 			var bounds = new mapboxgl.LngLatBounds();
-			var markerSpreader = createMarkerSpreader(map);
+			var markerSpreader = createMarkerSpreader(map, updateZoomHint);
 			var routeOffsets = buildRouteOffsets(payload.journeys);
 			payload.journeys.forEach(function (journey, index) {
 				addJourney(map, journey, bounds, index, routeOffsets[journey.id], markerSpreader, true);

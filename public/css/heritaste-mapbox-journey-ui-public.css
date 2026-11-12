@@ -642,6 +642,104 @@
 	}
 }
 
+/* Tip shown while nearby pins are spread apart. */
+.heritaste-map-zoom-hint {
+	position: absolute;
+	z-index: 5;
+	top: 24px;
+	left: 50%;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	max-width: min(440px, calc(100% - 520px));
+	padding: 8px 8px 8px 12px;
+	border: 1px solid rgba(184, 170, 156, 0.72);
+	border-radius: 8px;
+	background: rgba(255, 250, 242, 0.96);
+	box-shadow: 0 8px 24px rgba(42, 36, 30, 0.16);
+	color: var(--heritaste-map-ink);
+	transform: translateX(-50%);
+}
+
+.heritaste-map-zoom-hint[hidden] {
+	display: none;
+}
+
+.heritaste-map-zoom-hint p {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	font-size: 0.86rem;
+	line-height: 1.35;
+}
+
+.heritaste-map-zoom-hint__icon {
+	display: inline-grid;
+	flex: 0 0 auto;
+	place-items: center;
+	width: 28px;
+	height: 28px;
+	border: 1px solid rgba(42, 36, 30, 0.25);
+	border-radius: 4px;
+	background: #fff;
+	font-size: 1.15rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.heritaste-map-zoom-hint__close {
+	flex: 0 0 auto;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: var(--heritaste-map-ink);
+	font-size: 1.3rem;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.heritaste-map-zoom-hint__close:hover,
+.heritaste-map-zoom-hint__close:focus-visible {
+	background: rgba(42, 36, 30, 0.08);
+	outline: 2px solid var(--heritaste-map-ink);
+	outline-offset: 1px;
+}
+
+.heritaste-journey-map:has(.mapboxgl-popup) .heritaste-map-zoom-hint {
+	display: none;
+}
+
+@media (max-width: 600px) {
+	/* On phones the tip sits at the top under the site button, and the map
+	   controls move down while it is shown. */
+	.heritaste-map-zoom-hint {
+		top: 68px;
+		left: 16px;
+		right: 72px;
+		max-width: none;
+		padding: 6px 4px 6px 8px;
+		transform: none;
+	}
+
+	.heritaste-map-zoom-hint p {
+		gap: 8px;
+		font-size: 0.78rem;
+	}
+
+	.heritaste-map-zoom-hint__icon {
+		width: 24px;
+		height: 24px;
+	}
+
+	.heritaste-journey-map:has(.heritaste-map-zoom-hint:not([hidden])) .heritaste-map-style-switcher {
+		top: 160px;
+	}
+}
+
 /* Story video dialog (portrait 3:4 videos with waveform and subtitles). */
 .heritaste-video-dialog {
 	width: min(92vw, calc(84vh * 3 / 4), 560px);
