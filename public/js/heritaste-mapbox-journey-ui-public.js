@@ -274,19 +274,76 @@
 			var isEndpoint = stopIndex === 0 || stopIndex === journey.stops.length - 1;
 			var directNarrativeMarker = directNarrativeJourney && !isEndpoint;
 			var coordinate = routeCoordinates[stopIndex];
+			var fraction = null;
 
 			if (recipeStop) {
+				fraction = 0.5;
 				coordinate = getRouteMidpoint(routeCoordinates);
 			} else if (directNarrativeMarker) {
-				coordinate = getRoutePosition(routeCoordinates, stopIndex / (journey.stops.length - 1));
+				fraction = stopIndex / (journey.stops.length - 1);
+				coordinate = getRoutePosition(routeCoordinates, fraction);
 			}
 
 			return {
 				coordinate: coordinate,
 				recipe: recipeStop,
-				onRoute: recipeStop || directNarrativeMarker
+				onRoute: recipeStop || directNarrativeMarker,
+				route: routeCoordinates,
+				fraction: fraction
 			};
 		});
+	}
+
+	// Land areas (Natural Earth 1:50m, simplified, unnamed; see
+	// public/data/README.md). Returns a lookup giving the id of the land area
+	// at a coordinate, or -1 over water. Polygon edges are bucketed by 1°
+	// latitude bands so each lookup only tests nearby edges.
+	function createLandIndex(geojson) {
+		var polygons = [];
+
+		(geojson && geojson.features ? geojson.features : []).forEach(function (feature, featureIndex) {
+			var geometry = feature.geometry;
+			var parts = !geometry ? [] : (geometry.type === 'MultiPolygon' ? geometry.coordinates : (geometry.type === 'Polygon' ? [geometry.coordinates] : []));
+
+			parts.forEach(function (rings) {
+				var polygon = { id: featureIndex, minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity, bands: {} };
+				rings.forEach(function (ring) {
+					for (var current = 0, previous = ring.length - 1; current < ring.length; previous = current, current += 1) {
+						var start = ring[previous];
+						var end = ring[current];
+						polygon.minX = Math.min(polygon.minX, end[0]);
+						polygon.maxX = Math.max(polygon.maxX, end[0]);
+						polygon.minY = Math.min(polygon.minY, end[1]);
+						polygon.maxY = Math.max(polygon.maxY, end[1]);
+						for (var band = Math.floor(Math.min(start[1], end[1])); band <= Math.floor(Math.max(start[1], end[1])); band += 1) {
+							(polygon.bands[band] = polygon.bands[band] || []).push([start[0], start[1], end[0], end[1]]);
+						}
+					}
+				});
+				polygons.push(polygon);
+			});
+		});
+
+		return function landAt(longitude, latitude) {
+			for (var index = 0; index < polygons.length; index += 1) {
+				var polygon = polygons[index];
+				if (longitude < polygon.minX || longitude > polygon.maxX || latitude < polygon.minY || latitude > polygon.maxY) {
+					continue;
+				}
+				var edges = polygon.bands[Math.floor(latitude)] || [];
+				var inside = false;
+				for (var edgeIndex = 0; edgeIndex < edges.length; edgeIndex += 1) {
+					var edge = edges[edgeIndex];
+					if ((edge[1] > latitude) !== (edge[3] > latitude) && longitude < ((edge[2] - edge[0]) * (latitude - edge[1]) / (edge[3] - edge[1])) + edge[0]) {
+						inside = !inside;
+					}
+				}
+				if (inside) {
+					return polygon.id;
+				}
+			}
+			return -1;
+		};
 	}
 
 	// Nudges apart pins that overlap on screen, recalculated as the map moves.
@@ -301,6 +358,94 @@
 		var minimumGap = 32;
 		var iterations = 60;
 		var pullBack = 0.04;
+		var landAt = null;
+		var moving = false;
+
+		function landUnderTip(position, entry) {
+			var coordinate = map.unproject([position.x, position.y + entry.headLift]);
+			return landAt(coordinate.lng, coordinate.lat);
+		}
+
+		function clearOfOthers(candidate, positions, skip) {
+			for (var other = 0; other < positions.length; other += 1) {
+				if (other === skip) {
+					continue;
+				}
+				var dx = positions[other].x - candidate.x;
+				var dy = positions[other].y - candidate.y;
+				if ((dx * dx) + (dy * dy) < minimumGap * minimumGap * 0.7) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// A pin that had to move but now points at water or at another area
+		// looks for the nearest free spot in its own area (e.g. a Greek pin
+		// stays in Greece, never Turkey). Pins whose true place is not inside
+		// an outline are left alone.
+		function keepOnLand(positions, origins) {
+			entries.forEach(function (entry, index) {
+				if (entry.landId < 0) {
+					return;
+				}
+				var shiftX = positions[index].x - origins[index].x;
+				var shiftY = positions[index].y - origins[index].y;
+				if ((Math.abs(shiftX) < 0.5 && Math.abs(shiftY) < 0.5) || landUnderTip(positions[index], entry) === entry.landId) {
+					return;
+				}
+
+				var best = null;
+				var bestDistance = Infinity;
+				for (var radius = 6; radius <= 72 && !best; radius += 6) {
+					for (var step = 0; step < 12; step += 1) {
+						var angle = step * Math.PI / 6;
+						var candidate = { x: positions[index].x + (Math.cos(angle) * radius), y: positions[index].y + (Math.sin(angle) * radius) };
+						if (!clearOfOthers(candidate, positions, index) || landUnderTip(candidate, entry) !== entry.landId) {
+							continue;
+						}
+						var distance = Math.sqrt(Math.pow(candidate.x - origins[index].x, 2) + Math.pow(candidate.y - origins[index].y, 2));
+						if (distance < bestDistance) {
+							best = candidate;
+							bestDistance = distance;
+						}
+					}
+				}
+				if (best) {
+					positions[index] = best;
+				}
+			});
+		}
+
+		// Route pins (story and recipe stops) that fall over water slide along
+		// their route line to the nearest point on land.
+		function moveRoutePinsOntoLand() {
+			entries.forEach(function (entry) {
+				if (!entry.route || landAt(entry.lngLat[0], entry.lngLat[1]) >= 0) {
+					return;
+				}
+				for (var step = 1; step <= 40; step += 1) {
+					var found = null;
+					[-1, 1].some(function (direction) {
+						var fraction = entry.fraction + (direction * step * 0.01);
+						if (fraction <= 0.03 || fraction >= 0.97) {
+							return false;
+						}
+						var point = getRoutePosition(entry.route, fraction);
+						if (landAt(point[0], point[1]) >= 0) {
+							found = point;
+							return true;
+						}
+						return false;
+					});
+					if (found) {
+						entry.lngLat = found;
+						entry.marker.setLngLat(found);
+						break;
+					}
+				}
+			});
+		}
 
 		function layout() {
 			frame = 0;
@@ -351,6 +496,10 @@
 				}
 			}
 
+			if (landAt && !moving) {
+				keepOnLand(positions, origins);
+			}
+
 			// Only pins inside the visible map count towards "crowded".
 			var canvas = map.getContainer();
 			var largestShift = 0;
@@ -381,10 +530,26 @@
 
 		map.on('move', schedule);
 		map.on('resize', schedule);
+		// Land checks run once the map settles, keeping movement smooth.
+		map.on('movestart', function () {
+			moving = true;
+		});
+		map.on('moveend', function () {
+			moving = false;
+			schedule();
+		});
 
 		return {
-			add: function (marker, lngLat, headLift) {
-				entries.push({ marker: marker, lngLat: lngLat, headLift: headLift || 0 });
+			add: function (marker, lngLat, headLift, route, fraction) {
+				entries.push({ marker: marker, lngLat: lngLat, headLift: headLift || 0, route: route || null, fraction: fraction, landId: -1 });
+			},
+			setLand: function (lookup) {
+				landAt = lookup;
+				moveRoutePinsOntoLand();
+				entries.forEach(function (entry) {
+					entry.landId = landAt(entry.lngLat[0], entry.lngLat[1]);
+				});
+				schedule();
 			},
 			update: schedule
 		};
@@ -515,7 +680,7 @@
 			markerSpreader.add(new mapboxgl.Marker({ element: marker, anchor: recipeStop ? 'center' : 'bottom' })
 				.setLngLat(markerCoordinate)
 				.setPopup(popup)
-				.addTo(map), markerCoordinate, recipeStop ? 0 : 14);
+				.addTo(map), markerCoordinate, recipeStop ? 0 : 14, placement.onRoute ? placement.route : null, placement.fraction);
 		});
 	}
 
@@ -616,6 +781,21 @@
 				fitMapToJourneyData(map, bounds, container);
 				markerSpreader.update();
 			});
+
+			// Optional: without the land outline pins simply stay where the
+			// spreading puts them.
+			if (heritasteJourneyMap.landMaskUrl && window.fetch) {
+				window.fetch(heritasteJourneyMap.landMaskUrl)
+					.then(function (response) {
+						return response.ok ? response.json() : null;
+					})
+					.then(function (data) {
+						if (data) {
+							markerSpreader.setLand(createLandIndex(data));
+						}
+					})
+					.catch(function () {});
+			}
 
 			if (styleSelector) {
 				styleSelector.addEventListener('change', function () {

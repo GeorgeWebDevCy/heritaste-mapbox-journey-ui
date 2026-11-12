@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.12.0
+Stable tag: 1.13.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,9 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.13.0 =
+* Keep pins on land where possible: pins that are moved apart look for the nearest free spot on the same piece of land as their real location, and story or recipe pins on a route line slide along it off the water. Uses bundled, simplified Natural Earth land areas (unnamed, no external requests).
 
 = 1.12.0 =
 * Show a dismissible tip to use the + zoom button while nearby places have to be spread apart; it hides once zoomed in far enough or while a story panel is open.

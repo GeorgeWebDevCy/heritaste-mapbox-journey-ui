@@ -176,6 +176,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 				array(
 					'accessToken' => $token,
 					'style'       => (string) get_option( 'heritaste_mapbox_style', 'mapbox://styles/mapbox/standard' ),
+					'landMaskUrl' => plugin_dir_url( __FILE__ ) . 'data/areas.json?ver=' . rawurlencode( $this->version ),
 				)
 			);
 			$this->assets_configured = true;
