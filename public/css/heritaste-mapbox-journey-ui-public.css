@@ -724,6 +724,14 @@
 	font-size: 0.95rem;
 }
 
+.heritaste-map-selection__route {
+	color: #5f554d;
+}
+
+.heritaste-map-selection__route[hidden] {
+	display: none;
+}
+
 .heritaste-map-selection__all {
 	flex: 0 0 auto;
 	min-height: 36px;
@@ -758,8 +766,22 @@
 		transform: none;
 	}
 
+	/* On phones the button moves under the text so the route can use the
+	   full width of the bar. */
+	.heritaste-map-selection {
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
 	.heritaste-map-selection p {
+		flex: 1 1 100%;
 		font-size: 0.76rem;
+	}
+
+	.heritaste-map-selection__all {
+		min-height: 32px;
+		margin-left: auto;
+		padding: 4px 12px;
 	}
 
 	/* The selection bar needs the room; the style box returns with the overview. */

@@ -3,7 +3,7 @@ Contributors: georgenicolaou
 Tags: mapbox, maps, journeys, heritage
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.14.0
+Stable tag: 1.15.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -24,6 +24,9 @@ Updates are delivered from the plugin's public GitHub releases.
 2. Activate **Heritaste Mapbox Journey UI** from the Plugins screen.
 
 == Changelog ==
+
+= 1.15.0 =
+* Journeys can list route points (places named in the story) in a new "Route points" field. The selected journey's line passes through them, each is marked with a small labelled dot, and the route is spelled out in the selection bar and the text list.
 
 = 1.14.0 =
 * Show only one origin pin per participant at first. Choosing a person (their origin pin or their name in the legend) shows their route and story pins and zooms to the journey; other origin pins stay, dimmed. A bar names the selected person and offers "Show all participants"; Escape also returns to the overview.

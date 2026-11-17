@@ -122,7 +122,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 				<button type="button" class="heritaste-map-zoom-hint__close" data-zoom-hint-close aria-label="<?php esc_attr_e( 'Dismiss tip', 'heritaste-mapbox-journey-ui' ); ?>">&times;</button>
 			</div>
 			<div class="heritaste-map-selection" data-journey-selection hidden>
-				<p role="status"><strong data-journey-selection-name></strong><span><?php esc_html_e( 'Click a pin to read each part of the story.', 'heritaste-mapbox-journey-ui' ); ?></span></p>
+				<p role="status"><strong data-journey-selection-name></strong><span class="heritaste-map-selection__route" data-journey-selection-route data-label="<?php esc_attr_e( 'Route', 'heritaste-mapbox-journey-ui' ); ?>" hidden></span><span><?php esc_html_e( 'Click a pin to read each part of the story.', 'heritaste-mapbox-journey-ui' ); ?></span></p>
 				<button type="button" class="heritaste-map-selection__all" data-journey-show-all><?php esc_html_e( 'Show all participants', 'heritaste-mapbox-journey-ui' ); ?></button>
 			</div>
 			<aside class="heritaste-map-legend" aria-label="<?php esc_attr_e( 'Map legend', 'heritaste-mapbox-journey-ui' ); ?>">
@@ -151,6 +151,9 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 					<article class="heritaste-journey-summary">
 						<h4><?php echo esc_html( $journey['participant']['name'] ); ?></h4>
 						<p><?php echo esc_html( $journey['origin_country'] . ' → ' . $journey['destination_country'] ); ?></p>
+						<?php if ( ! empty( $journey['route_points'] ) ) : ?>
+							<p><?php echo esc_html( __( 'Route', 'heritaste-mapbox-journey-ui' ) . ': ' . implode( ' → ', wp_list_pluck( $journey['route_points'], 'name' ) ) ); ?></p>
+						<?php endif; ?>
 						<ol>
 							<?php foreach ( $journey['stops'] as $stop ) : ?>
 								<li>
@@ -301,6 +304,28 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 		$origin_country = sanitize_text_field( get_field( 'origin_country', $post_id ) );
 		$shared_color   = $this->get_origin_route_color( $origin_country );
 
+		// Places named in the story between origin and destination. The route
+		// line passes through them in order; they do not get story pins.
+		$route_points = array();
+		$points_value = get_field( 'journey_route_points', $post_id );
+		if ( is_array( $points_value ) ) {
+			foreach ( $points_value as $point ) {
+				if ( ! isset( $point['point_latitude'], $point['point_longitude'] ) || ! is_numeric( $point['point_latitude'] ) || ! is_numeric( $point['point_longitude'] ) ) {
+					continue;
+				}
+				$latitude  = (float) $point['point_latitude'];
+				$longitude = (float) $point['point_longitude'];
+				if ( $latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180 ) {
+					continue;
+				}
+				$route_points[] = array(
+					'name'      => sanitize_text_field( $point['point_name'] ?? '' ),
+					'latitude'  => $latitude,
+					'longitude' => $longitude,
+				);
+			}
+		}
+
 		return array(
 			'id'                  => absint( $post_id ),
 			'title'               => get_the_title( $post_id ),
@@ -315,6 +340,7 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 				'age'       => $participant_id ? absint( get_field( 'participant_age', $participant_id ) ) : 0,
 			),
 			'stops'               => $stops,
+			'route_points'        => $route_points,
 		);
 	}
 

@@ -257,23 +257,49 @@
 		return icon;
 	}
 
-	function getRouteCoordinates(journey) {
+	function getStopCoordinates(journey) {
 		return journey.stops.map(function (stop) {
 			return [stop.longitude, stop.latitude];
 		});
+	}
+
+	function hasRoutePoints(journey) {
+		return Boolean(journey.route_points && journey.route_points.length);
+	}
+
+	// The route line: origin, then any places named in the story, then the
+	// destination. Without route points it simply joins the stops.
+	function getRouteCoordinates(journey) {
+		var stops = getStopCoordinates(journey);
+		if (!hasRoutePoints(journey) || stops.length < 2) {
+			return stops;
+		}
+		return [stops[0]].concat(journey.route_points.map(function (point) {
+			return [point.longitude, point.latitude];
+		}), [stops[stops.length - 1]]);
+	}
+
+	// "Nepal - Country of Origin" -> "Nepal"
+	function getPlaceName(stop) {
+		return String(stop.title || '').split(' - ')[0];
 	}
 
 	// Where each stop's marker is drawn. Recipe and narrative stops sit on the
 	// route line; endpoints stay on their true coordinates.
 	function getMarkerPlacements(journey) {
 		var routeCoordinates = getRouteCoordinates(journey);
-		var directNarrativeJourney = isDirectNarrativeJourney(routeCoordinates);
+		// Story pins between origin and destination are spread along the route
+		// when the journey is drawn through route points, or when they share
+		// the origin/destination coordinates.
+		var stopCoordinates = getStopCoordinates(journey);
+		var directNarrativeJourney = hasRoutePoints(journey) || isDirectNarrativeJourney(stopCoordinates);
 
 		return journey.stops.map(function (stop, stopIndex) {
 			var recipeStop = isRecipeStop(stop);
 			var isEndpoint = stopIndex === 0 || stopIndex === journey.stops.length - 1;
 			var directNarrativeMarker = directNarrativeJourney && !isEndpoint;
-			var coordinate = routeCoordinates[stopIndex];
+			// Endpoints use their own stop; the route may include extra points.
+			var coordinate = stopCoordinates[stopIndex];
 			var fraction = null;
 
 			if (recipeStop) {
@@ -638,7 +664,65 @@
 			});
 		}
 
-		return [sourceId + '-casing', sourceId];
+		var layers = [sourceId + '-casing', sourceId];
+
+		// Small labelled dots mark the places named in the story.
+		if (hasRoutePoints(journey)) {
+			var pointsId = sourceId + '-points';
+			if (!map.getSource(pointsId)) {
+				map.addSource(pointsId, {
+					type: 'geojson',
+					data: {
+						type: 'FeatureCollection',
+						features: journey.route_points.map(function (point) {
+							return {
+								type: 'Feature',
+								properties: { name: point.name },
+								geometry: { type: 'Point', coordinates: [point.longitude, point.latitude] }
+							};
+						})
+					}
+				});
+			}
+			if (!map.getLayer(pointsId)) {
+				map.addLayer({
+					id: pointsId,
+					type: 'circle',
+					source: pointsId,
+					layout: { visibility: 'none' },
+					paint: {
+						'circle-radius': 5,
+						'circle-color': '#fffaf2',
+						'circle-stroke-color': journey.color,
+						'circle-stroke-width': 3
+					}
+				});
+			}
+			if (!map.getLayer(pointsId + '-labels')) {
+				map.addLayer({
+					id: pointsId + '-labels',
+					type: 'symbol',
+					source: pointsId,
+					layout: {
+						visibility: 'none',
+						'text-field': ['get', 'name'],
+						'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+						'text-size': 12,
+						'text-anchor': 'top',
+						'text-offset': [0, 0.8],
+						'text-max-width': 10
+					},
+					paint: {
+						'text-color': '#2a241e',
+						'text-halo-color': '#fffaf2',
+						'text-halo-width': 1.6
+					}
+				});
+			}
+			layers.push(pointsId, pointsId + '-labels');
+		}
+
+		return layers;
 	}
 
 	function addJourneyMarkers(map, journey, markerSpreader, onMarkerClick) {
@@ -702,28 +786,43 @@
 	}
 
 	function getInitialMapPadding(container) {
-		var legend = container.parentElement ? container.parentElement.querySelector('.heritaste-map-legend') : null;
+		var wrapper = container.parentElement;
+		var legend = wrapper ? wrapper.querySelector('.heritaste-map-legend') : null;
 		var legendRect = legend ? legend.getBoundingClientRect() : { width: 0, height: 0 };
 		var isNarrow = container.clientWidth <= 600;
-
-		if (isNarrow) {
-			return {
-				top: 88,
-				right: 64,
-				bottom: Math.min(Math.round(legendRect.height + 32), Math.round(container.clientHeight * 0.42)),
-				left: 48
-			};
-		}
-
-		// The legend sits in the bottom-left corner, so reserve space below the
-		// routes rather than a full-height column; journeys run mostly
-		// east-west, so this lets the first view zoom in further.
-		return {
+		var padding = isNarrow ? {
+			top: 88,
+			right: 64,
+			bottom: Math.min(Math.round(legendRect.height + 32), Math.round(container.clientHeight * 0.42)),
+			left: 48
+		} : {
+			// The legend sits in the bottom-left corner, so reserve space below
+			// the routes rather than a full-height column; journeys run mostly
+			// east-west, so this lets the first view zoom in further.
 			top: 110,
 			right: 72,
 			bottom: Math.min(Math.round(legendRect.height + 40), Math.round(container.clientHeight * 0.5)),
 			left: 56
 		};
+
+		// Keep the journey clear of the bar or tip shown across the top,
+		// allowing for pin heads, which stand about 36px above their point.
+		var containerTop = container.getBoundingClientRect().top;
+		['.heritaste-map-selection:not([hidden])', '.heritaste-map-zoom-hint:not([hidden])'].forEach(function (selector) {
+			var overlay = wrapper ? wrapper.querySelector(selector) : null;
+			var rect = overlay ? overlay.getBoundingClientRect() : null;
+			if (rect && rect.height) {
+				padding.top = Math.max(padding.top, Math.round(rect.bottom - containerTop + 48));
+			}
+		});
+
+		// Always leave some room for the map itself.
+		var spare = container.clientHeight - padding.top - padding.bottom - 140;
+		if (spare < 0) {
+			padding.bottom = Math.max(16, padding.bottom + spare);
+		}
+
+		return padding;
 	}
 
 	function fitMapToJourneyData(map, bounds, container, animate, maxZoom) {
@@ -754,6 +853,7 @@
 		var zoomHintDismissed = false;
 		var selectionBar = wrapper.querySelector('[data-journey-selection]');
 		var selectionName = wrapper.querySelector('[data-journey-selection-name]');
+		var selectionRoute = wrapper.querySelector('[data-journey-selection-route]');
 		var legendButtons = Array.prototype.slice.call(wrapper.querySelectorAll('[data-journey-id]'));
 		var selectedId = null;
 
@@ -846,6 +946,16 @@
 				}
 				if (selectionName && current) {
 					selectionName.textContent = current.journey.participant.name;
+				}
+				// Spell out the route for everyone, including screen-reader users.
+				if (selectionRoute) {
+					var routeNames = current && hasRoutePoints(current.journey)
+						? [getPlaceName(current.journey.stops[0])].concat(current.journey.route_points.map(function (point) {
+							return point.name;
+						}), [getPlaceName(current.journey.stops[current.journey.stops.length - 1])])
+						: [];
+					selectionRoute.hidden = !routeNames.length;
+					selectionRoute.textContent = routeNames.length ? (selectionRoute.getAttribute('data-label') || 'Route') + ': ' + routeNames.join(' → ') : '';
 				}
 				if (zoomHint) {
 					zoomHint.hidden = zoomHintDismissed || Boolean(current);

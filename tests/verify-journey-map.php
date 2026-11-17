@@ -11,7 +11,7 @@ $css         = file_get_contents( $root . '/public/css/heritaste-mapbox-journey-
 $land_mask   = (string) file_get_contents( $root . '/public/data/areas.json' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.14.0" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.15.0" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -66,6 +66,14 @@ $expectations = array(
 	'Pins keep button semantics'   => array( $javascript, "entry.marker.getElement().removeAttribute('role')" ),
 	'Pin click stays off the map'  => array( $javascript, 'event.stopPropagation();' ),
 	'Spread pins stay on screen'   => array( $javascript, 'position.x = Math.min(Math.max(position.x, edge), canvas.clientWidth - edge);' ),
+	'Route points payload'         => array( $public, "get_field( 'journey_route_points', \$post_id )" ),
+	'Route points validated'       => array( $public, "is_numeric( \$point['point_latitude'] )" ),
+	'Route through route points'   => array( $javascript, '[stops[0]].concat(journey.route_points.map(' ),
+	'Route point labels'           => array( $javascript, "'text-field': ['get', 'name']" ),
+	'Route spelled out in bar'     => array( $javascript, 'selectionRoute.textContent' ),
+	'Route in text fallback'       => array( $public, "wp_list_pluck( \$journey['route_points'], 'name' )" ),
+	'Journey clear of top bar'     => array( $javascript, "['.heritaste-map-selection:not([hidden])', '.heritaste-map-zoom-hint:not([hidden])']" ),
+	'Endpoints keep own location'  => array( $javascript, 'var coordinate = stopCoordinates[stopIndex];' ),
 	'Route contrast casing'        => array( $javascript, "id: sourceId + '-casing'" ),
 	'Legend-aware bottom padding'  => array( $javascript, 'bottom: Math.min(Math.round(legendRect.height + 40)' ),
 	'Shared colour applied'        => array( $public, '$shared_color ?:' ),
@@ -75,7 +83,7 @@ $expectations = array(
 	'Video stops on close'         => array( $javascript, "dialog.addEventListener('close'" ),
 	'Video fallback link'          => array( $public, "is_video_link( \$stop['audio'] )" ),
 	'Origin name hover style'      => array( $css, '.heritaste-map-marker--start:hover .heritaste-map-marker__name' ),
-	'Direct narrative route'       => array( $javascript, 'isDirectNarrativeJourney(routeCoordinates)' ),
+	'Direct narrative route'       => array( $javascript, 'isDirectNarrativeJourney(stopCoordinates)' ),
 	'Narrative markers on line'    => array( $javascript, 'coordinate = getRoutePosition(routeCoordinates, fraction)' ),
 	'Location pin marker anchor'   => array( $javascript, "anchor: recipeStop ? 'center' : 'bottom'" ),
 	'Start and end pin semantics'  => array( $javascript, "stopType === 'start'" ),
