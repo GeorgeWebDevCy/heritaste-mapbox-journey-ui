@@ -186,6 +186,22 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 					'accessToken' => $token,
 					'style'       => (string) get_option( 'heritaste_mapbox_style', 'mapbox://styles/mapbox/standard' ),
 					'landMaskUrl' => plugin_dir_url( __FILE__ ) . 'data/areas.json?ver=' . rawurlencode( $this->version ),
+					'i18n'        => array(
+						/* translators: %s: story pin title. */
+						'listenTo'     => __( 'Listen to the full story: %s', 'heritaste-mapbox-journey-ui' ),
+						'audioPrompt'  => __( 'Click the icon to listen to the full story', 'heritaste-mapbox-journey-ui' ),
+						/* translators: %d: participant age in years. */
+						'age'          => __( 'Age %d', 'heritaste-mapbox-journey-ui' ),
+						'viewDocument' => __( 'View supporting document', 'heritaste-mapbox-journey-ui' ),
+						'loadError'    => __( 'The journey data could not be loaded.', 'heritaste-mapbox-journey-ui' ),
+						'closeVideo'   => __( 'Close video', 'heritaste-mapbox-journey-ui' ),
+						'closeStory'   => __( 'Close story panel', 'heritaste-mapbox-journey-ui' ),
+						'origin'       => __( 'Origin', 'heritaste-mapbox-journey-ui' ),
+						'destination'  => __( 'Destination', 'heritaste-mapbox-journey-ui' ),
+						'recipe'       => __( 'Recipe', 'heritaste-mapbox-journey-ui' ),
+						'stop'         => __( 'Stop', 'heritaste-mapbox-journey-ui' ),
+						'route'        => __( 'Route', 'heritaste-mapbox-journey-ui' ),
+					),
 				)
 			);
 			$this->assets_configured = true;
@@ -238,6 +254,8 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 				'fields'                 => 'ids',
 				'no_found_rows'          => true,
 				'update_post_meta_cache' => true,
+				// Lets WPML return only the current language's journeys.
+				'suppress_filters'       => false,
 			)
 		);
 
@@ -302,7 +320,11 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 		}
 
 		$origin_country = sanitize_text_field( get_field( 'origin_country', $post_id ) );
-		$shared_color   = $this->get_origin_route_color( $origin_country );
+		// Translated journeys name the country in their own language ("Νεπάλ"),
+		// so look the shared colour up on the default-language original.
+		$original_id    = (int) apply_filters( 'wpml_object_id', $post_id, 'ht_journey', true, apply_filters( 'wpml_default_language', null ) );
+		$color_country  = $original_id && $original_id !== $post_id ? sanitize_text_field( get_field( 'origin_country', $original_id ) ) : $origin_country;
+		$shared_color   = $this->get_origin_route_color( $color_country );
 
 		// Places named in the story between origin and destination. The route
 		// line passes through them in order; they do not get story pins.

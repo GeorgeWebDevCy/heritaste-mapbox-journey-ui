@@ -1,0 +1,114 @@
+# Front-end strings for the Heritaste journey map. Admin screens stay in English.
+msgid ""
+msgstr ""
+"Project-Id-Version: Heritaste Mapbox Journey UI\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Add a Mapbox public access token under Settings → Heritaste Journey Map."
+msgstr ""
+
+msgid "The journey map is not configured yet."
+msgstr ""
+
+msgid "The journey map requires Advanced Custom Fields Pro."
+msgstr ""
+
+msgid "No participant journeys have been published yet."
+msgstr ""
+
+msgid "Participant journeys"
+msgstr ""
+
+msgid "Interactive world map of participant journeys"
+msgstr ""
+
+msgid "Map style"
+msgstr ""
+
+msgid "Site default"
+msgstr ""
+
+msgid "Standard"
+msgstr ""
+
+msgid "Satellite"
+msgstr ""
+
+msgid "Streets"
+msgstr ""
+
+msgid "Light"
+msgstr ""
+
+msgid "Dark"
+msgstr ""
+
+msgid "Choose a pin or a name to see that person’s journey."
+msgstr ""
+
+msgid "Some pins are close together: use the + button to zoom in."
+msgstr ""
+
+msgid "Dismiss tip"
+msgstr ""
+
+msgid "Route"
+msgstr ""
+
+msgid "Click a pin to read each part of the story."
+msgstr ""
+
+msgid "Show all participants"
+msgstr ""
+
+msgid "Map legend"
+msgstr ""
+
+msgid "Pin meanings"
+msgstr ""
+
+msgid "Origin"
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+msgid "Recipe"
+msgstr ""
+
+msgid "Destination"
+msgstr ""
+
+msgid "Journeys and stops"
+msgstr ""
+
+msgid "Watch the full story"
+msgstr ""
+
+msgid "Listen to the full story: %s"
+msgstr ""
+
+msgid "Click the icon to listen to the full story"
+msgstr ""
+
+msgid "Age %d"
+msgstr ""
+
+msgid "View supporting document"
+msgstr ""
+
+msgid "The journey data could not be loaded."
+msgstr ""
+
+msgid "Close video"
+msgstr ""
+
+msgid "Close story panel"
+msgstr ""
+
+msgid "Journey stop"
+msgstr ""

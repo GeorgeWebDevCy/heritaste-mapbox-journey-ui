@@ -1,0 +1,114 @@
+# Front-end strings for the Heritaste journey map. Admin screens stay in English.
+msgid ""
+msgstr ""
+"Project-Id-Version: Heritaste Mapbox Journey UI\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Add a Mapbox public access token under Settings → Heritaste Journey Map."
+msgstr "Προσθέστε ένα δημόσιο διακριτικό πρόσβασης Mapbox στις Ρυθμίσεις → Heritaste Journey Map."
+
+msgid "The journey map is not configured yet."
+msgstr "Ο χάρτης των διαδρομών δεν έχει ρυθμιστεί ακόμη."
+
+msgid "The journey map requires Advanced Custom Fields Pro."
+msgstr "Ο χάρτης των διαδρομών απαιτεί το Advanced Custom Fields Pro."
+
+msgid "No participant journeys have been published yet."
+msgstr "Δεν έχουν δημοσιευτεί ακόμη διαδρομές συμμετεχόντων."
+
+msgid "Participant journeys"
+msgstr "Διαδρομές συμμετεχόντων"
+
+msgid "Interactive world map of participant journeys"
+msgstr "Διαδραστικός παγκόσμιος χάρτης με τις διαδρομές των συμμετεχόντων"
+
+msgid "Map style"
+msgstr "Στυλ χάρτη"
+
+msgid "Site default"
+msgstr "Προεπιλογή ιστότοπου"
+
+msgid "Standard"
+msgstr "Τυπικό"
+
+msgid "Satellite"
+msgstr "Δορυφορικό"
+
+msgid "Streets"
+msgstr "Οδικός χάρτης"
+
+msgid "Light"
+msgstr "Ανοιχτόχρωμο"
+
+msgid "Dark"
+msgstr "Σκουρόχρωμο"
+
+msgid "Choose a pin or a name to see that person’s journey."
+msgstr "Επιλέξτε μια καρφίτσα ή ένα όνομα για να δείτε τη διαδρομή του ατόμου."
+
+msgid "Some pins are close together: use the + button to zoom in."
+msgstr "Ορισμένες καρφίτσες είναι κοντά μεταξύ τους: πατήστε το κουμπί + για μεγέθυνση."
+
+msgid "Dismiss tip"
+msgstr "Κλείσιμο συμβουλής"
+
+msgid "Route"
+msgstr "Διαδρομή"
+
+msgid "Click a pin to read each part of the story."
+msgstr "Πατήστε μια καρφίτσα για να διαβάσετε κάθε μέρος της ιστορίας."
+
+msgid "Show all participants"
+msgstr "Όλοι οι συμμετέχοντες"
+
+msgid "Map legend"
+msgstr "Υπόμνημα χάρτη"
+
+msgid "Pin meanings"
+msgstr "Τι σημαίνουν οι καρφίτσες"
+
+msgid "Origin"
+msgstr "Καταγωγή"
+
+msgid "Stop"
+msgstr "Στάση"
+
+msgid "Recipe"
+msgstr "Συνταγή"
+
+msgid "Destination"
+msgstr "Προορισμός"
+
+msgid "Journeys and stops"
+msgstr "Διαδρομές και στάσεις"
+
+msgid "Watch the full story"
+msgstr "Δείτε ολόκληρη την ιστορία"
+
+msgid "Listen to the full story: %s"
+msgstr "Ακούστε ολόκληρη την ιστορία: %s"
+
+msgid "Click the icon to listen to the full story"
+msgstr "Πατήστε το εικονίδιο για να ακούσετε ολόκληρη την ιστορία"
+
+msgid "Age %d"
+msgstr "Ηλικία: %d"
+
+msgid "View supporting document"
+msgstr "Προβολή εγγράφου"
+
+msgid "The journey data could not be loaded."
+msgstr "Δεν ήταν δυνατή η φόρτωση των δεδομένων των διαδρομών."
+
+msgid "Close video"
+msgstr "Κλείσιμο βίντεο"
+
+msgid "Close story panel"
+msgstr "Κλείσιμο της ιστορίας"
+
+msgid "Journey stop"
+msgstr "Στάση διαδρομής"

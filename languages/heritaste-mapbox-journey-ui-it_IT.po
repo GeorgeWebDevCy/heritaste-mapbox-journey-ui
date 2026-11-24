@@ -1,0 +1,114 @@
+# Front-end strings for the Heritaste journey map. Admin screens stay in English.
+msgid ""
+msgstr ""
+"Project-Id-Version: Heritaste Mapbox Journey UI\n"
+"Language: it_IT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Add a Mapbox public access token under Settings → Heritaste Journey Map."
+msgstr "Aggiungi un token di accesso pubblico Mapbox in Impostazioni → Heritaste Journey Map."
+
+msgid "The journey map is not configured yet."
+msgstr "La mappa dei percorsi non è ancora configurata."
+
+msgid "The journey map requires Advanced Custom Fields Pro."
+msgstr "La mappa dei percorsi richiede Advanced Custom Fields Pro."
+
+msgid "No participant journeys have been published yet."
+msgstr "Non è stato ancora pubblicato alcun percorso dei partecipanti."
+
+msgid "Participant journeys"
+msgstr "Percorsi dei partecipanti"
+
+msgid "Interactive world map of participant journeys"
+msgstr "Mappa interattiva del mondo con i percorsi dei partecipanti"
+
+msgid "Map style"
+msgstr "Stile della mappa"
+
+msgid "Site default"
+msgstr "Predefinito del sito"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Satellite"
+msgstr "Satellite"
+
+msgid "Streets"
+msgstr "Strade"
+
+msgid "Light"
+msgstr "Chiaro"
+
+msgid "Dark"
+msgstr "Scuro"
+
+msgid "Choose a pin or a name to see that person’s journey."
+msgstr "Scegli un segnaposto o un nome per vedere il percorso di quella persona."
+
+msgid "Some pins are close together: use the + button to zoom in."
+msgstr "Alcuni segnaposto sono vicini tra loro: usa il pulsante + per ingrandire."
+
+msgid "Dismiss tip"
+msgstr "Chiudi il suggerimento"
+
+msgid "Route"
+msgstr "Percorso"
+
+msgid "Click a pin to read each part of the story."
+msgstr "Fai clic su un segnaposto per leggere ogni parte della storia."
+
+msgid "Show all participants"
+msgstr "Mostra tutti i partecipanti"
+
+msgid "Map legend"
+msgstr "Legenda della mappa"
+
+msgid "Pin meanings"
+msgstr "Significato dei segnaposto"
+
+msgid "Origin"
+msgstr "Origine"
+
+msgid "Stop"
+msgstr "Tappa"
+
+msgid "Recipe"
+msgstr "Ricetta"
+
+msgid "Destination"
+msgstr "Destinazione"
+
+msgid "Journeys and stops"
+msgstr "Percorsi e tappe"
+
+msgid "Watch the full story"
+msgstr "Guarda la storia completa"
+
+msgid "Listen to the full story: %s"
+msgstr "Ascolta la storia completa: %s"
+
+msgid "Click the icon to listen to the full story"
+msgstr "Fai clic sull'icona per ascoltare la storia completa"
+
+msgid "Age %d"
+msgstr "Età: %d anni"
+
+msgid "View supporting document"
+msgstr "Visualizza il documento"
+
+msgid "The journey data could not be loaded."
+msgstr "Non è stato possibile caricare i dati dei percorsi."
+
+msgid "Close video"
+msgstr "Chiudi il video"
+
+msgid "Close story panel"
+msgstr "Chiudi il pannello della storia"
+
+msgid "Journey stop"
+msgstr "Tappa del percorso"

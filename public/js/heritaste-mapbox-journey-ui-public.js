@@ -1,6 +1,12 @@
 (function () {
 	'use strict';
 
+	// Translated strings from PHP (wp_localize_script), with English fallbacks.
+	function t(key, fallback) {
+		var strings = (window.heritasteJourneyMap && window.heritasteJourneyMap.i18n) || {};
+		return strings[key] || fallback;
+	}
+
 	function createTextElement(tag, className, text) {
 		var element = document.createElement(tag);
 		if (className) {
@@ -46,7 +52,7 @@
 		frame.className = 'heritaste-video-dialog__frame';
 		closeButton.type = 'button';
 		closeButton.className = 'heritaste-video-dialog__close';
-		closeButton.setAttribute('aria-label', 'Close video');
+		closeButton.setAttribute('aria-label', t('closeVideo', 'Close video'));
 		closeButton.textContent = '×';
 		closeButton.addEventListener('click', function () {
 			dialog.close();
@@ -99,7 +105,7 @@
 		wrapper.className = 'heritaste-map-popup__audio-cta';
 		link.className = 'heritaste-map-popup__audio-button';
 		link.href = stop.audio || '#';
-		link.setAttribute('aria-label', 'Listen to the full story: ' + stop.title);
+		link.setAttribute('aria-label', t('listenTo', 'Listen to the full story: %s').replace('%s', stop.title));
 
 		var videoId = stop.audio ? getYouTubeId(stop.audio) : '';
 
@@ -133,7 +139,7 @@
 		icon.appendChild(soundWave);
 		link.appendChild(icon);
 		wrapper.appendChild(link);
-		wrapper.appendChild(createTextElement('span', 'heritaste-map-popup__audio-prompt', 'Click the icon to listen to the full story'));
+		wrapper.appendChild(createTextElement('span', 'heritaste-map-popup__audio-prompt', t('audioPrompt', 'Click the icon to listen to the full story')));
 
 		return wrapper;
 	}
@@ -154,7 +160,7 @@
 		content.appendChild(createTextElement('h3', 'heritaste-map-popup__title', stop.title));
 		content.appendChild(createTextElement('p', 'heritaste-map-popup__participant', journey.participant.name));
 		if (journey.participant.age) {
-			content.appendChild(createTextElement('p', 'heritaste-map-popup__meta', 'Age ' + journey.participant.age));
+			content.appendChild(createTextElement('p', 'heritaste-map-popup__meta', t('age', 'Age %d').replace('%d', journey.participant.age)));
 		}
 
 		// Each line break from the source content becomes its own paragraph.
@@ -175,7 +181,7 @@
 			documentLink.href = stop.document;
 			documentLink.target = '_blank';
 			documentLink.rel = 'noopener noreferrer';
-			documentLink.textContent = stop.document_label || 'View supporting document';
+			documentLink.textContent = stop.document_label || t('viewDocument', 'View supporting document');
 			content.appendChild(documentLink);
 		}
 
@@ -737,7 +743,7 @@
 			marker.type = 'button';
 			marker.className = 'heritaste-map-marker heritaste-map-marker--' + stopType;
 			marker.style.setProperty('--heritaste-marker-color', journey.color);
-			marker.setAttribute('aria-label', journey.participant.name + ' — ' + (stopType === 'start' ? 'Origin' : (stopType === 'end' ? 'Destination' : (stopType === 'recipe' ? 'Recipe' : 'Stop'))) + ': ' + stop.title);
+			marker.setAttribute('aria-label', journey.participant.name + ' — ' + (stopType === 'start' ? t('origin', 'Origin') : (stopType === 'end' ? t('destination', 'Destination') : (stopType === 'recipe' ? t('recipe', 'Recipe') : t('stop', 'Stop')))) + ': ' + stop.title);
 			if (stopType === 'start') {
 				// Shown by CSS on hover/focus; the popup still opens only on click.
 				marker.appendChild(createTextElement('span', 'heritaste-map-marker__name', journey.participant.name));
@@ -761,7 +767,7 @@
 					content.scrollTop = 0;
 				}
 				if (closeButton) {
-					closeButton.setAttribute('aria-label', 'Close story panel');
+					closeButton.setAttribute('aria-label', t('closeStory', 'Close story panel'));
 					closeButton.focus({ preventScroll: true });
 				}
 			});
@@ -881,7 +887,7 @@
 		try {
 			payload = JSON.parse(payloadElement.textContent);
 		} catch (error) {
-			container.textContent = 'The journey data could not be loaded.';
+			container.textContent = t('loadError', 'The journey data could not be loaded.');
 			return;
 		}
 
@@ -955,7 +961,7 @@
 						}), [getPlaceName(current.journey.stops[current.journey.stops.length - 1])])
 						: [];
 					selectionRoute.hidden = !routeNames.length;
-					selectionRoute.textContent = routeNames.length ? (selectionRoute.getAttribute('data-label') || 'Route') + ': ' + routeNames.join(' → ') : '';
+					selectionRoute.textContent = routeNames.length ? (selectionRoute.getAttribute('data-label') || t('route', 'Route')) + ': ' + routeNames.join(' → ') : '';
 				}
 				if (zoomHint) {
 					zoomHint.hidden = zoomHintDismissed || Boolean(current);
