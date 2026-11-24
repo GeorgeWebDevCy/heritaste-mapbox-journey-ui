@@ -261,6 +261,72 @@
 	cursor: progress;
 }
 
+/* WPML language links, under the map style menu. */
+.heritaste-map-languages {
+	display: grid;
+	gap: 5px;
+	margin-top: 6px;
+}
+
+.heritaste-map-languages__label {
+	font-size: 0.72rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.heritaste-map-languages ul {
+	display: flex;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.heritaste-map-languages li {
+	flex: 1 1 0;
+	margin: 0;
+	padding: 0;
+}
+
+.heritaste-map-languages a {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	min-height: 36px;
+	padding: 4px 6px;
+	border: 1px solid #b8aa9c;
+	border-radius: 6px;
+	background: #ffffff;
+	color: #2a241e;
+	font: 600 0.78rem/1 "Work Sans", Arial, sans-serif;
+	text-decoration: none;
+}
+
+.heritaste-map-languages a:hover {
+	border-color: #d68c28;
+}
+
+.heritaste-map-languages a[aria-current="page"] {
+	border-color: #d68c28;
+	background: #fdf0dc;
+	box-shadow: inset 0 0 0 1px #d68c28;
+}
+
+.heritaste-map-languages a:focus-visible {
+	outline: 3px solid #d68c28;
+	outline-offset: 2px;
+}
+
+.heritaste-map-languages img {
+	display: block;
+	width: 18px;
+	height: 12px;
+	border-radius: 2px;
+	object-fit: cover;
+}
+
 .heritaste-map-legend h3 {
 	margin: 0 0 14px;
 	color: #2a241e;

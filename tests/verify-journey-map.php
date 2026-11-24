@@ -11,7 +11,7 @@ $css         = file_get_contents( $root . '/public/css/heritaste-mapbox-journey-
 $land_mask   = (string) file_get_contents( $root . '/public/data/areas.json' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.16.0" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.17.0" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -47,6 +47,9 @@ $expectations = array(
 	'Translatable script strings'  => array( $public, "'i18n'        => array(" ),
 	'Script translation helper'    => array( $javascript, "t('age', 'Age %d')" ),
 	'Italian translation file'     => array( file_exists( $root . '/languages/heritaste-mapbox-journey-ui-it_IT.mo' ) ? 'ok' : '', 'ok' ),
+	'WPML language links'          => array( $public, "apply_filters( 'wpml_active_languages', null" ),
+	'Current language marked'      => array( $public, 'aria-current="page"' ),
+	'Language link styles'         => array( $css, '.heritaste-map-languages a[aria-current="page"]' ),
 	'Greek translation file'       => array( file_exists( $root . '/languages/heritaste-mapbox-journey-ui-el.mo' ) ? 'ok' : '', 'ok' ),
 	'Style box hidden under panel' => array( $css, ':has(.mapboxgl-popup) .heritaste-map-style-switcher' ),
 	'Screen-space pin spreading'   => array( $javascript, 'createMarkerSpreader(map, updateZoomHint)' ),

@@ -112,3 +112,6 @@ msgstr ""
 
 msgid "Journey stop"
 msgstr ""
+
+msgid "Language"
+msgstr ""

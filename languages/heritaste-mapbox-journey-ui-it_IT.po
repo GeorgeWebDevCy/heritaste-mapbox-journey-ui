@@ -30,7 +30,7 @@ msgid "Map style"
 msgstr "Stile della mappa"
 
 msgid "Site default"
-msgstr "Predefinito del sito"
+msgstr "Predefinito"
 
 msgid "Standard"
 msgstr "Standard"
@@ -112,3 +112,6 @@ msgstr "Chiudi il pannello della storia"
 
 msgid "Journey stop"
 msgstr "Tappa del percorso"
+
+msgid "Language"
+msgstr "Lingua"

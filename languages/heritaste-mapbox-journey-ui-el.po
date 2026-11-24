@@ -30,7 +30,7 @@ msgid "Map style"
 msgstr "Στυλ χάρτη"
 
 msgid "Site default"
-msgstr "Προεπιλογή ιστότοπου"
+msgstr "Προεπιλογή"
 
 msgid "Standard"
 msgstr "Τυπικό"
@@ -112,3 +112,6 @@ msgstr "Κλείσιμο της ιστορίας"
 
 msgid "Journey stop"
 msgstr "Στάση διαδρομής"
+
+msgid "Language"
+msgstr "Γλώσσα"

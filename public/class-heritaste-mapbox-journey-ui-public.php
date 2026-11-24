@@ -116,6 +116,25 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 					<option value="mapbox://styles/mapbox/light-v11"><?php esc_html_e( 'Light', 'heritaste-mapbox-journey-ui' ); ?></option>
 					<option value="mapbox://styles/mapbox/dark-v11"><?php esc_html_e( 'Dark', 'heritaste-mapbox-journey-ui' ); ?></option>
 				</select>
+				<?php $languages = $this->get_language_links(); ?>
+				<?php if ( count( $languages ) > 1 ) : ?>
+					<nav class="heritaste-map-languages" aria-labelledby="<?php echo esc_attr( $instance_id ); ?>-languages">
+						<span class="heritaste-map-languages__label" id="<?php echo esc_attr( $instance_id ); ?>-languages"><?php esc_html_e( 'Language', 'heritaste-mapbox-journey-ui' ); ?></span>
+						<ul>
+							<?php foreach ( $languages as $language ) : ?>
+								<li>
+									<a href="<?php echo esc_url( $language['url'] ); ?>" hreflang="<?php echo esc_attr( $language['code'] ); ?>" lang="<?php echo esc_attr( $language['code'] ); ?>"<?php echo $language['active'] ? ' aria-current="page"' : ''; ?>>
+										<?php if ( $language['flag'] ) : ?>
+											<img src="<?php echo esc_url( $language['flag'] ); ?>" alt="" width="18" height="12">
+										<?php endif; ?>
+										<span aria-hidden="true"><?php echo esc_html( strtoupper( $language['code'] ) ); ?></span>
+										<span class="screen-reader-text"><?php echo esc_html( $language['name'] ); ?></span>
+									</a>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</nav>
+				<?php endif; ?>
 			</div>
 			<div class="heritaste-map-zoom-hint" data-zoom-hint hidden>
 				<p role="status"><span><?php esc_html_e( 'Choose a pin or a name to see that person’s journey.', 'heritaste-mapbox-journey-ui' ); ?><span class="heritaste-map-zoom-hint__crowded" data-zoom-hint-crowded hidden> <?php esc_html_e( 'Some pins are close together: use the + button to zoom in.', 'heritaste-mapbox-journey-ui' ); ?></span></span></p>
@@ -231,6 +250,31 @@ class Heritaste_Mapbox_Journey_Ui_Public {
 		}
 
 		return $colors;
+	}
+
+	/**
+	 * Language links for the map's own switcher (the fullscreen page has no
+	 * site header). Empty unless WPML is active with several languages.
+	 */
+	private function get_language_links() {
+		$languages = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0, 'orderby' => 'custom' ) );
+		$links     = array();
+
+		foreach ( (array) $languages as $language ) {
+			if ( empty( $language['code'] ) || empty( $language['url'] ) ) {
+				continue;
+			}
+
+			$links[] = array(
+				'code'   => sanitize_key( $language['code'] ),
+				'url'    => $language['url'],
+				'name'   => isset( $language['native_name'] ) ? $language['native_name'] : $language['code'],
+				'flag'   => isset( $language['country_flag_url'] ) ? $language['country_flag_url'] : '',
+				'active' => ! empty( $language['active'] ),
+			);
+		}
+
+		return $links;
 	}
 
 	private function get_origin_route_color( $origin_country ) {
