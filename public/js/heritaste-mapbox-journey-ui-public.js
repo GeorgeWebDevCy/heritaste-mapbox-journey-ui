@@ -953,10 +953,11 @@
 				if (selectionName && current) {
 					selectionName.textContent = current.journey.participant.name;
 				}
-				// Spell out the route for everyone, including screen-reader users.
+				// Spell out the route for everyone, including screen-reader users:
+				// origin, any places named in the story, then the destination.
 				if (selectionRoute) {
-					var routeNames = current && hasRoutePoints(current.journey)
-						? [getPlaceName(current.journey.stops[0])].concat(current.journey.route_points.map(function (point) {
+					var routeNames = current && current.journey.stops.length > 1
+						? [getPlaceName(current.journey.stops[0])].concat((current.journey.route_points || []).map(function (point) {
 							return point.name;
 						}), [getPlaceName(current.journey.stops[current.journey.stops.length - 1])])
 						: [];

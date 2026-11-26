@@ -11,7 +11,7 @@ $css         = file_get_contents( $root . '/public/css/heritaste-mapbox-journey-
 $land_mask   = (string) file_get_contents( $root . '/public/data/areas.json' );
 $failures    = array();
 $expectations = array(
-	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.17.0" ),
+	'Plugin version constant'      => array( $main, "HERITASTE_MAPBOX_JOURNEY_UI_VERSION', '1.17.1" ),
 	'Settings registration hook'   => array( $core, "'admin_init'" ),
 	'Settings menu hook'           => array( $core, "'admin_menu'" ),
 	'Public token validation'      => array( $admin, "strpos( \$value, 'pk.' )" ),
@@ -42,6 +42,7 @@ $expectations = array(
 	'Albania default shared colour'=> array( $public, 'Albania = #1f5fa8' ),
 	'Panel opens at its top'       => array( $javascript, 'focusAfterOpen: false' ),
 	'Recipe pin from title'        => array( $javascript, "return /recipe/i.test(stop.title || '')" ),
+	'Route line for every journey' => array( $javascript, '(current.journey.route_points || []).map' ),
 	'WPML current-language query'  => array( $public, "'suppress_filters'       => false" ),
 	'Colour from default language' => array( $public, "apply_filters( 'wpml_default_language', null )" ),
 	'Translatable script strings'  => array( $public, "'i18n'        => array(" ),
